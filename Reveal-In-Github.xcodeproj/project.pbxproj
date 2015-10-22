@@ -1,0 +1,275 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */; settings = {ASSET_TAGS = (); }; };
+		70DE90B11BD932D300E29A15 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B01BD932D300E29A15 /* Cocoa.framework */; };
+		70DE90B31BD932D800E29A15 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B21BD932D800E29A15 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		705EEF501BD80FB900A29083 /* Reveal-In-Github.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Reveal-In-Github.xcplugin"; sourceTree = BUILT_PRODUCTS_DIR; };
+		705EEF531BD80FB900A29083 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RevealInGithubPlugin.m; sourceTree = "<group>"; };
+		705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RevealInGithubPlugin.h; sourceTree = "<group>"; };
+		70DE90B01BD932D300E29A15 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		70DE90B21BD932D800E29A15 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		705EEF4D1BD80FB900A29083 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70DE90B31BD932D800E29A15 /* Foundation.framework in Frameworks */,
+				70DE90B11BD932D300E29A15 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		705EEF471BD80FB900A29083 = {
+			isa = PBXGroup;
+			children = (
+				70DE90B21BD932D800E29A15 /* Foundation.framework */,
+				70DE90B01BD932D300E29A15 /* Cocoa.framework */,
+				705EEF521BD80FB900A29083 /* Reveal-In-Github */,
+				705EEF511BD80FB900A29083 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		705EEF511BD80FB900A29083 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				705EEF501BD80FB900A29083 /* Reveal-In-Github.xcplugin */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		705EEF521BD80FB900A29083 /* Reveal-In-Github */ = {
+			isa = PBXGroup;
+			children = (
+				705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */,
+				705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */,
+				705EEF531BD80FB900A29083 /* Info.plist */,
+			);
+			path = "Reveal-In-Github";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		705EEF4F1BD80FB900A29083 /* Reveal-In-Github */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 705EEF561BD80FB900A29083 /* Build configuration list for PBXNativeTarget "Reveal-In-Github" */;
+			buildPhases = (
+				705EEF4C1BD80FB900A29083 /* Sources */,
+				705EEF4D1BD80FB900A29083 /* Frameworks */,
+				705EEF4E1BD80FB900A29083 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Reveal-In-Github";
+			productName = "Reveal-In-Github";
+			productReference = 705EEF501BD80FB900A29083 /* Reveal-In-Github.xcplugin */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		705EEF481BD80FB900A29083 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = lzwjava;
+				TargetAttributes = {
+					705EEF4F1BD80FB900A29083 = {
+						CreatedOnToolsVersion = 7.0;
+					};
+				};
+			};
+			buildConfigurationList = 705EEF4B1BD80FB900A29083 /* Build configuration list for PBXProject "Reveal-In-Github" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 705EEF471BD80FB900A29083;
+			productRefGroup = 705EEF511BD80FB900A29083 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				705EEF4F1BD80FB900A29083 /* Reveal-In-Github */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		705EEF4E1BD80FB900A29083 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		705EEF4C1BD80FB900A29083 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		705EEF541BD80FB900A29083 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		705EEF551BD80FB900A29083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		705EEF571BD80FB900A29083 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "Reveal-In-Github/Info.plist";
+				INSTALL_PATH = "~/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.lzwjava.Reveal-In-Github";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				WRAPPER_EXTENSION = xcplugin;
+			};
+			name = Debug;
+		};
+		705EEF581BD80FB900A29083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "";
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = "Reveal-In-Github/Info.plist";
+				INSTALL_PATH = "~/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.lzwjava.Reveal-In-Github";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				WRAPPER_EXTENSION = xcplugin;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		705EEF4B1BD80FB900A29083 /* Build configuration list for PBXProject "Reveal-In-Github" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				705EEF541BD80FB900A29083 /* Debug */,
+				705EEF551BD80FB900A29083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		705EEF561BD80FB900A29083 /* Build configuration list for PBXNativeTarget "Reveal-In-Github" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				705EEF571BD80FB900A29083 /* Debug */,
+				705EEF581BD80FB900A29083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 705EEF481BD80FB900A29083 /* Project object */;
+}
