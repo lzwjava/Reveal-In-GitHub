@@ -173,9 +173,9 @@ static Class IDEWorkspaceWindowControllerClass;
     NSString *activeDocumentFullPath = [activeDocumentURL path];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
     
-    NSString *githubRepoPath = [self githubRepoPathForDirectory:activeDocumentDirectoryPath];
+    NSString *remoteRepoPath = [self remoteRepoPathForDirectory:activeDocumentDirectoryPath];
     
-    if (!githubRepoPath)
+    if (!remoteRepoPath)
     {
         return;
     }
@@ -195,8 +195,7 @@ static Class IDEWorkspaceWindowControllerClass;
     NSString *commitHash = [commitHashInfo objectAtIndex:1];
     NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
     
-    if (!filenameWithPathInCommit)
-    {
+    if (!filenameWithPathInCommit) {
         return;
     }
     
@@ -205,7 +204,7 @@ static Class IDEWorkspaceWindowControllerClass;
     if (startLineNumber != endLineNumber) {
         [path appendFormat:@"-L%ld", endLineNumber];
     }
-    [self openRepo:githubRepoPath withPath:path];
+    [self openRepo:remoteRepoPath withPath:path];
 }
 
 // Performs a git command with given args in the given directory
@@ -239,7 +238,48 @@ static Class IDEWorkspaceWindowControllerClass;
     return output;
 }
 
-- (NSString *)githubRepoPathForDirectory:(NSString *)dir
+- (NSString *)remotePathFromRemoteURL:(NSString *)remotePath {
+    // Check for SSH protocol
+    NSRange begin = [remotePath rangeOfString:@"git@"];
+    
+    if (begin.location == NSNotFound)
+    {
+        // SSH protocol not found, check for GIT protocol
+        begin = [remotePath rangeOfString:@"git://"];
+    }
+    if (begin.location == NSNotFound)
+    {
+        // HTTPS protocol check
+        begin = [remotePath rangeOfString:@"https://"];
+    }
+    if (begin.location == NSNotFound)
+    {
+        // HTTP protocol check
+        begin = [remotePath rangeOfString:@"http://"];
+    }
+    
+    NSRange end = [remotePath rangeOfString:@".git (fetch)"];
+    
+    if (end.location == NSNotFound)
+    {
+        // Alternate remote url end
+        end = [remotePath rangeOfString:@" (fetch)"];
+    }
+    
+    if ((begin.location != NSNotFound) &&
+        (end.location != NSNotFound))
+    {
+        NSUInteger githubURLBegin = begin.location + begin.length;
+        NSUInteger githubURLLength = end.location - githubURLBegin;
+        return [[remotePath
+          substringWithRange:NSMakeRange(githubURLBegin, githubURLLength)]
+         stringByReplacingOccurrencesOfString:@":" withString:@"/"];
+    } else {
+        return nil;
+    }
+}
+
+- (NSString *)remoteRepoPathForDirectory:(NSString *)dir
 {
     if (dir.length == 0)
     {
@@ -247,63 +287,30 @@ static Class IDEWorkspaceWindowControllerClass;
         return nil;
     }
     
-    // Get github username and repo name
-    NSString *githubURLComponent = nil;
+    // Get Github username and repo name
     NSArray *args = @[@"remote", @"--verbose"];
     NSString *output = [self outputGitWithArguments:args inPath:dir];
-    NSArray *remotes = [output componentsSeparatedByString:@"\n"];
-    NSLog(@"GIT remotes: %@", remotes);
+    NSArray *remoteURLs = [output componentsSeparatedByString:@"\n"];
+    NSLog(@"GIT remotes: %@", remoteURLs);
     
     NSMutableSet *remotePaths = [NSMutableSet set];
     
-    for (NSString *remote in remotes)
+    for (NSString *remoteURL in remoteURLs)
     {
-        // Check for SSH protocol
-        NSRange begin = [remote rangeOfString:@"git@"];
-        
-        if (begin.location == NSNotFound)
-        {
-            // SSH protocol not found, check for GIT protocol
-            begin = [remote rangeOfString:@"git://"];
-        }
-        if (begin.location == NSNotFound)
-        {
-            // HTTPS protocol check
-            begin = [remote rangeOfString:@"https://"];
-        }
-        if (begin.location == NSNotFound)
-        {
-            // HTTP protocol check
-            begin = [remote rangeOfString:@"http://"];
-        }
-        
-        NSRange end = [remote rangeOfString:@".git (fetch)"];
-        
-        if (end.location == NSNotFound)
-        {
-            // Alternate remote url end
-            end = [remote rangeOfString:@" (fetch)"];
-        }
-        
-        if ((begin.location != NSNotFound) &&
-            (end.location != NSNotFound))
-        {
-            NSUInteger githubURLBegin = begin.location + begin.length;
-            NSUInteger githubURLLength = end.location - githubURLBegin;
-            githubURLComponent = [[remote
-                                   substringWithRange:NSMakeRange(githubURLBegin, githubURLLength)]
-                                  stringByReplacingOccurrencesOfString:@":" withString:@"/"];
-            
-            [remotePaths addObject:githubURLComponent];
+        NSString *remotePath = [self remotePathFromRemoteURL:remoteURL];
+        if (remotePath) {
+            [remotePaths addObject:remotePath];
         }
     }
+    
+    NSString *selectedRemotePath;
     
     if (remotePaths.count > 1)
     {
         NSArray *sortedRemotePaths = remotePaths.allObjects;
         
         // Ask the user what remote to use.
-        // Attention: Due to NSRunAlertPanel maximal three remotes are supported.
+        // Attention: Due to NSRunAlert maximal three remotes are supported.
         
         NSAlert *alert = [[NSAlert alloc] init];
         alert.alertStyle = NSInformationalAlertStyle;
@@ -312,27 +319,24 @@ static Class IDEWorkspaceWindowControllerClass;
         [alert addButtonWithTitle:[sortedRemotePaths objectAtIndex:1]];
         [alert addButtonWithTitle:(sortedRemotePaths.count > 2 ? [sortedRemotePaths objectAtIndex:2] : nil)];
         
-        NSInteger result = [alert runModal];
-        githubURLComponent = [sortedRemotePaths objectAtIndex:result];
+        NSModalResponse button = [alert runModal];
+        if (button == NSAlertFirstButtonReturn) {
+            selectedRemotePath = sortedRemotePaths[0];
+        } else if (button == NSAlertSecondButtonReturn) {
+            selectedRemotePath = sortedRemotePaths[1];
+        } else if (button == NSAlertThirdButtonReturn) {
+            selectedRemotePath = sortedRemotePaths[2];
+        }
     }
     
-    if (githubURLComponent.length == 0)
+    if (selectedRemotePath.length == 0)
     {
         [self showMessage:@"Unable to find github remote URL."];
         return nil;
     }
     
-    return githubURLComponent;
+    return selectedRemotePath;
 }
-
-- (void)showMessage:(NSString *)message {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"OK"];
-    [alert setMessageText: message];
-    [alert setAlertStyle:NSWarningAlertStyle];
-    [alert runModal];
-}
-
 
 - (NSString *)filenameWithPathInCommit:(NSString *)commitHash forActiveDocumentURL:(NSURL *)activeDocumentURL {
     NSArray *args = @[@"show", @"--name-only", @"--pretty=format:", commitHash];
@@ -360,10 +364,20 @@ static Class IDEWorkspaceWindowControllerClass;
     return filenameWithPathInCommit;
 }
 
+#pragma mark - Xcode Interactive
+
 - (void)openRepo:(NSString *)repo withPath:(NSString *)path {
     NSString *secureBaseUrl = [NSString stringWithFormat:@"https://%@", repo];
     NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
     [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
+}
+
+- (void)showMessage:(NSString *)message {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"OK"];
+    [alert setMessageText: message];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert runModal];
 }
 
 @end
