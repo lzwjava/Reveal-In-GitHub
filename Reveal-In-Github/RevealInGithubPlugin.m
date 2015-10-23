@@ -149,10 +149,222 @@ static Class IDEWorkspaceWindowControllerClass;
     return nil;
 }
 
+- (NSURL *)activeDocument
+{
+    NSArray *windows = [IDEWorkspaceWindowControllerClass valueForKey:@"workspaceWindowControllers"];
+    for (id workspaceWindowController in windows)
+    {
+        if ([workspaceWindowController valueForKey:@"workspaceWindow"] == self.ideWorkspaceWindow || windows.count == 1)
+        {
+            id document = [[workspaceWindowController valueForKey:@"editorArea"] valueForKey:@"primaryEditorDocument"];
+            return [document fileURL];
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - Actions
 
 - (void)openBlameInGithub:(id)sender {
+    NSUInteger startLineNumber = self.selectionStartLineNumber;
+    NSUInteger endLineNumber = self.selectionEndLineNumber;
     
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *activeDocumentFullPath = [activeDocumentURL path];
+    NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
+    
+    NSString *githubRepoPath = [self githubRepoPathForDirectory:activeDocumentDirectoryPath];
+    
+    if (!githubRepoPath)
+    {
+        return;
+    }
+    
+    // Get last commit hash
+    NSArray *args = @[@"log", @"-n1", @"--no-decorate", activeDocumentFullPath];
+    NSString *rawLastCommitHash = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
+    NSLog(@"GIT log: %@", rawLastCommitHash);
+    NSArray *commitHashInfo = [rawLastCommitHash componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    if (commitHashInfo.count < 2)
+    {
+        NSLog(@"Unable to find filename with git log.");
+        return;
+    }
+    
+    NSString *commitHash = [commitHashInfo objectAtIndex:1];
+    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
+    
+    if (!filenameWithPathInCommit)
+    {
+        return;
+    }
+    
+    NSString *path = [NSString stringWithFormat:@"/blob/%@/%@#L%ld-%ld",
+                                     commitHash,
+                                     filenameWithPathInCommit,
+                                     (unsigned long)startLineNumber,
+                                     (unsigned long)endLineNumber];
+    [self openRepo:githubRepoPath withPath:path];
+}
+
+// Performs a git command with given args in the given directory
+- (NSString *)outputGitWithArguments:(NSArray *)args inPath:(NSString *)path
+{
+    if (path.length == 0)
+    {
+        NSLog(@"Invalid path for git working directory.");
+        return nil;
+    }
+    
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = @"/usr/bin/xcrun";
+    task.currentDirectoryPath = path;
+    task.arguments = [@[@"git", @"--no-pager"] arrayByAddingObjectsFromArray:args];
+    task.standardOutput = [NSPipe pipe];
+    NSFileHandle *file = [task.standardOutput fileHandleForReading];
+    
+    [task launch];
+    
+    // For some reason [task waitUntilExit]; does not return sometimes. Therefore this rather hackish solution:
+    int count = 0;
+    while (task.isRunning && (count < 10))
+    {
+        [NSThread sleepForTimeInterval:0.1];
+        count++;
+    }
+    
+    NSString *output = [[NSString alloc] initWithData:[file readDataToEndOfFile] encoding:NSUTF8StringEncoding];
+    
+    return output;
+}
+
+- (NSString *)githubRepoPathForDirectory:(NSString *)dir
+{
+    if (dir.length == 0)
+    {
+        NSLog(@"Invalid git repository path.");
+        return nil;
+    }
+    
+    // Get github username and repo name
+    NSString *githubURLComponent = nil;
+    NSArray *args = @[@"remote", @"--verbose"];
+    NSString *output = [self outputGitWithArguments:args inPath:dir];
+    NSArray *remotes = [output componentsSeparatedByString:@"\n"];
+    NSLog(@"GIT remotes: %@", remotes);
+    
+    NSMutableSet *remotePaths = [NSMutableSet set];
+    
+    for (NSString *remote in remotes)
+    {
+        // Check for SSH protocol
+        NSRange begin = [remote rangeOfString:@"git@"];
+        
+        if (begin.location == NSNotFound)
+        {
+            // SSH protocol not found, check for GIT protocol
+            begin = [remote rangeOfString:@"git://"];
+        }
+        if (begin.location == NSNotFound)
+        {
+            // HTTPS protocol check
+            begin = [remote rangeOfString:@"https://"];
+        }
+        if (begin.location == NSNotFound)
+        {
+            // HTTP protocol check
+            begin = [remote rangeOfString:@"http://"];
+        }
+        
+        NSRange end = [remote rangeOfString:@".git (fetch)"];
+        
+        if (end.location == NSNotFound)
+        {
+            // Alternate remote url end
+            end = [remote rangeOfString:@" (fetch)"];
+        }
+        
+        if ((begin.location != NSNotFound) &&
+            (end.location != NSNotFound))
+        {
+            NSUInteger githubURLBegin = begin.location + begin.length;
+            NSUInteger githubURLLength = end.location - githubURLBegin;
+            githubURLComponent = [[remote
+                                   substringWithRange:NSMakeRange(githubURLBegin, githubURLLength)]
+                                  stringByReplacingOccurrencesOfString:@":" withString:@"/"];
+            
+            [remotePaths addObject:githubURLComponent];
+        }
+    }
+    
+    if (remotePaths.count > 1)
+    {
+        NSArray *sortedRemotePaths = remotePaths.allObjects;
+        
+        // Ask the user what remote to use.
+        // Attention: Due to NSRunAlertPanel maximal three remotes are supported.
+        
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.alertStyle = NSInformationalAlertStyle;
+        alert.messageText = [NSString stringWithFormat:@"This repository has %ld remotes configured. Which one do you want to open?", remotePaths.count];
+        [alert addButtonWithTitle:[sortedRemotePaths objectAtIndex:0]];
+        [alert addButtonWithTitle:[sortedRemotePaths objectAtIndex:1]];
+        [alert addButtonWithTitle:(sortedRemotePaths.count > 2 ? [sortedRemotePaths objectAtIndex:2] : nil)];
+        
+        NSInteger result = [alert runModal];
+        githubURLComponent = [sortedRemotePaths objectAtIndex:result];
+    }
+    
+    if (githubURLComponent.length == 0)
+    {
+        [self showMessage:@"Unable to find github remote URL."];
+        return nil;
+    }
+    
+    return githubURLComponent;
+}
+
+- (void)showMessage:(NSString *)message {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"OK"];
+    [alert setMessageText: message];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert runModal];
+}
+
+
+- (NSString *)filenameWithPathInCommit:(NSString *)commitHash forActiveDocumentURL:(NSURL *)activeDocumentURL {
+    NSArray *args = @[@"show", @"--name-only", @"--pretty=format:", commitHash];
+    NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
+    NSString *files = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
+    NSLog(@"GIT show: %@", files);
+    
+    NSString *activeDocumentFilename = [activeDocumentURL lastPathComponent];
+    NSString *filenameWithPathInCommit = nil;
+    for (NSString *filenameWithPath in [files componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]])
+    {
+        if ([filenameWithPath hasSuffix:activeDocumentFilename])
+        {
+            filenameWithPathInCommit = [filenameWithPath stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+            break;
+        }
+    }
+    
+    if (!filenameWithPathInCommit)
+    {
+        [self showMessage:@"Unable to find file in commit."];
+        return nil;
+    }
+    
+    return filenameWithPathInCommit;
+}
+
+- (void)openRepo:(NSString *)repo withPath:(NSString *)path {
+    NSString *secureBaseUrl = [NSString stringWithFormat:@"https://%@", repo];
+    NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
+    [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
 }
 
 
