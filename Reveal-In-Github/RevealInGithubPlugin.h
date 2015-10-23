@@ -6,10 +6,7 @@
 //  Copyright © 2015年 lzwjava. All rights reserved.
 //
 
-#define NS_BLOCK_ASSERTIONS
-
-#import <Foundation/Foundation.h>
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 
 @interface RevealInGithubPlugin : NSObject
 

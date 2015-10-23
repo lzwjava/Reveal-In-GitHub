@@ -7,7 +7,6 @@
 //
 
 #import "RevealInGithubPlugin.h"
-#import <Cocoa/Cocoa.h>
 
 #ifdef DEBUG
 #   define LZLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -201,11 +200,11 @@ static Class IDEWorkspaceWindowControllerClass;
         return;
     }
     
-    NSString *path = [NSString stringWithFormat:@"/blob/%@/%@#L%ld-%ld",
-                                     commitHash,
-                                     filenameWithPathInCommit,
-                                     (unsigned long)startLineNumber,
-                                     (unsigned long)endLineNumber];
+    NSMutableString *path = [[NSString stringWithFormat:@"/blame/%@/%@#L%ld",
+                           commitHash, filenameWithPathInCommit, startLineNumber] mutableCopy];
+    if (startLineNumber != endLineNumber) {
+        [path appendFormat:@"-L%ld", endLineNumber];
+    }
     [self openRepo:githubRepoPath withPath:path];
 }
 
@@ -366,6 +365,5 @@ static Class IDEWorkspaceWindowControllerClass;
     NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
     [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
 }
-
 
 @end
