@@ -59,6 +59,10 @@ static Class IDEWorkspaceWindowControllerClass;
     return instance;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 #pragma mark - Notification
 
 - (void)addNotification {
@@ -96,17 +100,32 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSMenu *githubMenu = [self githubMenu];
     
-    // Create action menu items
-    NSMenuItem *openBlameItem = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Open Blame in GitHub" action:@selector(openBlameInGithub:) keyEquivalent:@"b"];
-    [openBlameItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    openBlameItem.target = self;
-
-    [githubMenu addItem:openBlameItem];
+    NSMenuItem *history = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"History" action:@selector(openHistory:) keyEquivalent:@"H"];
+    [history setKeyEquivalentModifierMask:NSCommandKeyMask];
+    history.target = self;
+    [githubMenu addItem:history];
     
-    NSMenuItem *clearDefaultRepo = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Clear Default Repo" action:@selector(clearDefaultRepo:) keyEquivalent:@""];
-    clearDefaultRepo.target = self;
-    [githubMenu addItem:clearDefaultRepo];
+    NSMenuItem *blame = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Blame" action:@selector(openBlame:) keyEquivalent:@"B"];
+    [blame setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
+    blame.target = self;
+    [githubMenu addItem:blame];
+    
+    NSMenuItem *issue = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Issues" action:@selector(openIssues:) keyEquivalent:@"I"];
+    [issue setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
+    issue.target = self;
+    [githubMenu addItem:issue];
+    
+    NSMenuItem *PR = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"PRs" action:@selector(openPRs:) keyEquivalent:@"P"];
+    [PR setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
+    PR.target = self;
+    [githubMenu addItem:PR];
+    
+    NSMenuItem *clearDefault = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Clear Defaults" action:@selector(clearDefaultRepo:) keyEquivalent:@""];
+    clearDefault.target = self;
+    [githubMenu addItem:clearDefault];
 }
 
 - (void)applicationDidAddCurrentMenu:(NSNotification *)noti {
@@ -172,7 +191,7 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Actions
 
-- (void)openBlameInGithub:(id)sender {
+- (void)openBlame:(id)sender {
     NSUInteger startLineNumber = self.selectionStartLineNumber;
     NSUInteger endLineNumber = self.selectionEndLineNumber;
     
@@ -180,28 +199,17 @@ static Class IDEWorkspaceWindowControllerClass;
     NSString *activeDocumentFullPath = [activeDocumentURL path];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
     
-    NSString *remoteRepoPath = [self remoteRepoPathForDirectory:activeDocumentDirectoryPath];
-    
-    if (!remoteRepoPath)
-    {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
         return;
     }
     
-    // Get last commit hash
-    NSArray *args = @[@"log", @"-n1", @"--no-decorate", activeDocumentFullPath];
-    NSString *rawLastCommitHash = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
-    NSLog(@"GIT log: %@", rawLastCommitHash);
-    NSArray *commitHashInfo = [rawLastCommitHash componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
-    if (commitHashInfo.count < 2)
-    {
-        NSLog(@"Unable to find filename with git log.");
+    NSString *commitHash = [self lastestCommitHash];
+    if (!commitHash) {
         return;
     }
     
-    NSString *commitHash = [commitHashInfo objectAtIndex:1];
     NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
-    
     if (!filenameWithPathInCommit) {
         return;
     }
@@ -286,13 +294,7 @@ static Class IDEWorkspaceWindowControllerClass;
     }
 }
 
-- (NSString *)remoteRepoPathForDirectory:(NSString *)dir
-{
-    if (dir.length == 0)
-    {
-        NSLog(@"Invalid git repository path.");
-        return nil;
-    }
+- (NSString *)remoteRepoPath {
     NSString *defaultRepo = [self defaultRepo];
     if (defaultRepo != nil) {
         return defaultRepo;
@@ -359,7 +361,6 @@ static Class IDEWorkspaceWindowControllerClass;
     NSArray *args = @[@"show", @"--name-only", @"--pretty=format:", commitHash];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
     NSString *files = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
-    NSLog(@"GIT show: %@", files);
     
     NSString *activeDocumentFilename = [activeDocumentURL lastPathComponent];
     NSString *filenameWithPathInCommit = nil;
@@ -399,6 +400,26 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Git Utils
 
+- (NSString *)lastestCommitHash {
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *activeDocumentFullPath = [activeDocumentURL path];
+    NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
+    // Get last commit hash
+    NSArray *args = @[@"log", @"-n1", @"--no-decorate", activeDocumentFullPath];
+    NSString *rawLastCommitHash = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
+    LZLog(@"GIT log: %@", rawLastCommitHash);
+    NSArray *commitHashInfo = [rawLastCommitHash componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    if (commitHashInfo.count < 2)
+    {
+        [self showMessage:@"Unable to find lastest commit."];
+        return nil;
+    }
+    
+    NSString *commitHash = [commitHashInfo objectAtIndex:1];
+    return commitHash;
+}
+
 - (NSString *)gitRootPath {
     NSURL *activeDocumentURL = [self activeDocument];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
@@ -436,6 +457,70 @@ static Class IDEWorkspaceWindowControllerClass;
         [self removeDefaultRepo];
         [self showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open blame in github, will ask you to select new default repo.", defaultRepo]];
     }
+}
+
+#pragma mark - Open issues 
+
+- (void)openIssues:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        [self showMessage:@"Clould not find remote repo path"];
+        return;
+    }
+    [self openIssueAtIndex:0 remoteRepoPath:remoteRepoPath];
+}
+
+- (void)openIssueAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
+    NSMutableString *path = [NSMutableString stringWithFormat:@"/issues"];
+    if (index > 0) {
+        [path appendFormat:@"/%ld", index];
+    }
+    [self openRepo:remoteRepoPath withPath:path];
+}
+
+#pragma mark - Open PRs
+
+- (void)openPRs:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        [self showMessage:@"Clould not find remote repo path"];
+        return;
+    }
+    [self openPRAtIndex:0 remoteRepoPath:remoteRepoPath];
+}
+
+- (void)openPRAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
+    NSString *path;
+    if (index > 0) {
+        path = [NSString stringWithFormat:@"/pull/%ld", index];
+    } else {
+        path = @"/pulls";
+    }
+    [self openRepo:remoteRepoPath withPath:path];
+}
+
+#pragma mark - Open History
+
+- (void)openHistory:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        return;
+    }
+    
+    NSString *commitHash = [self lastestCommitHash];
+    if (!commitHash) {
+        return;
+    }
+    
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
+    if (!filenameWithPathInCommit) {
+        return;
+    }
+    
+    NSString *path = [NSString stringWithFormat:@"/commits/%@/%@",
+                              commitHash, filenameWithPathInCommit];
+    [self openRepo:remoteRepoPath withPath:path];
 }
 
 @end
