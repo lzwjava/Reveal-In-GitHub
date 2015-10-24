@@ -16,6 +16,8 @@
 
 id objc_getClass(const char* name);
 
+NSString *const kRIGDefaultRepo = @"com.lzwjava.reveal-in-github.defaultRepo";
+
 static Class DVTSourceTextViewClass;
 static Class IDESourceCodeEditorClass;
 static Class IDEApplicationClass;
@@ -59,7 +61,7 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Notification
 
-- (void)addNotification{
+- (void)addNotification {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:nil];
     [nc addObserver:self selector:@selector(applicationDidAddCurrentMenu:) name:NSMenuDidChangeItemNotification object:nil];
@@ -92,14 +94,19 @@ static Class IDEWorkspaceWindowControllerClass;
                   name:NSApplicationDidFinishLaunchingNotification
                 object:NSApp];
     
-    NSMenu *sixToolsMenu = [self githubMenu];
+    NSMenu *githubMenu = [self githubMenu];
     
     // Create action menu items
-    NSMenuItem *openBlameItem = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Open blame in GitHub" action:@selector(openBlameInGithub:) keyEquivalent:@"c"];
-    [openBlameItem setKeyEquivalentModifierMask:NSControlKeyMask];
-    
+    NSMenuItem *openBlameItem = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Open Blame in GitHub" action:@selector(openBlameInGithub:) keyEquivalent:@"b"];
+    [openBlameItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
     openBlameItem.target = self;
-    [sixToolsMenu addItem:openBlameItem];
+
+    [githubMenu addItem:openBlameItem];
+    
+    NSMenuItem *clearDefaultRepo = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Clear Default Repo" action:@selector(clearDefaultRepo:) keyEquivalent:@""];
+    clearDefaultRepo.target = self;
+    [githubMenu addItem:clearDefaultRepo];
 }
 
 - (void)applicationDidAddCurrentMenu:(NSNotification *)noti {
@@ -286,12 +293,22 @@ static Class IDEWorkspaceWindowControllerClass;
         NSLog(@"Invalid git repository path.");
         return nil;
     }
-    
+    NSString *defaultRepo = [self defaultRepo];
+    if (defaultRepo != nil) {
+        return defaultRepo;
+    } else {
+        NSString *selectedRepo = [self getOrAskRemoteRepoPath];
+        [self setDefaultRepo:selectedRepo];
+        return selectedRepo;
+    }
+}
+
+- (NSString *)getOrAskRemoteRepoPath {
+    NSString *rootPath = [self gitRootPath];
     // Get Github username and repo name
     NSArray *args = @[@"remote", @"--verbose"];
-    NSString *output = [self outputGitWithArguments:args inPath:dir];
+    NSString *output = [self outputGitWithArguments:args inPath:rootPath];
     NSArray *remoteURLs = [output componentsSeparatedByString:@"\n"];
-    NSLog(@"GIT remotes: %@", remoteURLs);
     
     NSMutableSet *remotePaths = [NSMutableSet set];
     
@@ -305,8 +322,7 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSString *selectedRemotePath;
     
-    if (remotePaths.count > 1)
-    {
+    if (remotePaths.count > 1) {
         NSArray *sortedRemotePaths = remotePaths.allObjects;
         
         // Ask the user what remote to use.
@@ -336,6 +352,7 @@ static Class IDEWorkspaceWindowControllerClass;
     }
     
     return selectedRemotePath;
+    
 }
 
 - (NSString *)filenameWithPathInCommit:(NSString *)commitHash forActiveDocumentURL:(NSURL *)activeDocumentURL {
@@ -378,6 +395,47 @@ static Class IDEWorkspaceWindowControllerClass;
     [alert setMessageText: message];
     [alert setAlertStyle:NSWarningAlertStyle];
     [alert runModal];
+}
+
+#pragma mark - Git Utils
+
+- (NSString *)gitRootPath {
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
+    NSArray *args = @[@"rev-parse", @"--show-toplevel"];
+    NSString *rootPath = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
+    return [rootPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+
+- (NSString *)defaultRepoKey {
+    NSString *gitPath = [self gitRootPath];
+    return [NSString stringWithFormat:@"%@:%@", kRIGDefaultRepo, gitPath];
+}
+
+- (void)setDefaultRepo:(NSString *)defaultRepo {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:defaultRepo forKey:[self defaultRepoKey]];
+}
+
+- (void)removeDefaultRepo {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud removeObjectForKey:[self defaultRepoKey]];
+}
+
+- (NSString *)defaultRepo {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:[self defaultRepoKey]];
+}
+
+#pragma mark - Clear Default Repo 
+
+- (void)clearDefaultRepo:(id)sender {
+    NSString *defaultRepo = [self defaultRepo];
+    if (defaultRepo == nil) {
+        [self showMessage:@"There's no default repo setting."];
+    } else {
+        [self removeDefaultRepo];
+        [self showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open blame in github, will ask you to select new default repo.", defaultRepo]];
+    }
 }
 
 @end
