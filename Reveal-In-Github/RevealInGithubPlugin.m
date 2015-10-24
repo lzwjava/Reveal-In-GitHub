@@ -101,6 +101,11 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSMenu *githubMenu = [self githubMenu];
     
+    NSMenuItem *file = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"File" action:@selector(openFile:) keyEquivalent:@"F"];
+    [file setKeyEquivalentModifierMask:NSAlternateKeyMask];
+    file.target = self;
+    [githubMenu addItem:file];
+    
     NSMenuItem *history = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"History" action:@selector(openHistory:) keyEquivalent:@"H"];
     [history setKeyEquivalentModifierMask:NSCommandKeyMask];
     history.target = self;
@@ -208,8 +213,8 @@ static Class IDEWorkspaceWindowControllerClass;
     NSUInteger start = self.selectionStartLineNumber;
     NSUInteger end = self.selectionEndLineNumber;
     
-    NSMutableString *path = [[NSString stringWithFormat:@"/blame/%@/%@#L%ld",
-                           commitHash, filenameWithPathInCommit, start] mutableCopy];
+    NSMutableString *path = [NSMutableString stringWithFormat:@"/blame/%@/%@#L%ld",
+                           commitHash, filenameWithPathInCommit, start];
     if (start != end) {
         [path appendFormat:@"-L%ld", end];
     }
@@ -245,8 +250,9 @@ static Class IDEWorkspaceWindowControllerClass;
     }
     
     NSString *selectedRemotePath;
-    
-    if (remotePaths.count > 1) {
+    if (remotePaths.count == 1) {
+        selectedRemotePath = [remotePaths allObjects][0];
+    } else if (remotePaths.count > 1) {
         NSArray *sortedRemotePaths = remotePaths.allObjects;
         
         // Ask the user what remote to use.
@@ -541,7 +547,35 @@ static Class IDEWorkspaceWindowControllerClass;
     }
     
     NSString *path = [NSString stringWithFormat:@"/commits/%@/%@",
-                              commitHash, filenameWithPathInCommit];
+                      commitHash, filenameWithPathInCommit];
+    [self openRepo:remoteRepoPath withPath:path];
+}
+
+#pragma mark - Open File
+
+- (void)openFile:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        return;
+    }
+    
+    NSString *commitHash = [self lastestCommitHash];
+    if (!commitHash) {
+        return;
+    }
+    
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
+    if (!filenameWithPathInCommit) {
+        return;
+    }
+    
+    [self findSelection];
+    NSString *path = [NSString stringWithFormat:@"/blob/%@/%@#L%ld",
+                      commitHash, filenameWithPathInCommit, self.selectionStartLineNumber];
+    if (self.selectionStartLineNumber != self.selectionEndLineNumber) {
+        path = [path stringByAppendingFormat:@"-L%ld", self.selectionEndLineNumber];
+    }
     [self openRepo:remoteRepoPath withPath:path];
 }
 
