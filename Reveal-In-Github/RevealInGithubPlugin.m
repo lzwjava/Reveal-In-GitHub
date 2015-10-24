@@ -443,7 +443,7 @@ static Class IDEWorkspaceWindowControllerClass;
         [self showMessage:@"There's no default repo setting."];
     } else {
         [self removeDefaultRepo];
-        [self showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open blame in github, will ask you to select new default repo.", defaultRepo]];
+        [self showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open github, will ask you to select new default repo.", defaultRepo]];
     }
 }
 
