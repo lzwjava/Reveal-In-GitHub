@@ -88,13 +88,18 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSMenu *githubMenu = [self githubMenu];
     
-    NSMenuItem *file = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"File" action:@selector(openFile:) keyEquivalent:@"F"];
-    [file setKeyEquivalentModifierMask:NSAlternateKeyMask];
+    NSMenuItem *repo = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Repo" action:@selector(openRepo:) keyEquivalent:@"R"];
+    [repo setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
+    repo.target = self;
+    [githubMenu addItem:repo];
+    
+    NSMenuItem *file = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Quick File" action:@selector(openFile:) keyEquivalent:@"Q"];
+    [file setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
     file.target = self;
     [githubMenu addItem:file];
     
-    NSMenuItem *history = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"History" action:@selector(openHistory:) keyEquivalent:@"H"];
-    [history setKeyEquivalentModifierMask:NSCommandKeyMask];
+    NSMenuItem *history = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"List History" action:@selector(openHistory:) keyEquivalent:@"L"];
+    [history setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
     history.target = self;
     [githubMenu addItem:history];
     
@@ -597,6 +602,16 @@ static Class IDEWorkspaceWindowControllerClass;
         path = [path stringByAppendingFormat:@"-L%ld", self.selectionEndLineNumber];
     }
     [self openRepo:remoteRepoPath withPath:path];
+}
+
+#pragma mark - Open Repo
+
+- (void)openRepo:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        return;
+    }
+    [self openRepo:remoteRepoPath withPath:@""];
 }
 
 @end
