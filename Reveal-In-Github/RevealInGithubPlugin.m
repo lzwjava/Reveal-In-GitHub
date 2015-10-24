@@ -26,6 +26,7 @@ static Class IDEWorkspaceWindowControllerClass;
 @interface RevealInGithubPlugin()
 
 @property (nonatomic, strong) id ideWorkspaceWindow;
+@property (nonatomic, strong) id sourceTextView;
 @property (nonatomic, assign) NSUInteger selectionStartLineNumber;
 @property (nonatomic, assign) NSUInteger selectionEndLineNumber;
 @property (nonatomic, assign) BOOL useHTTPS;
@@ -68,10 +69,10 @@ static Class IDEWorkspaceWindowControllerClass;
 - (void)addNotification {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:nil];
-    [nc addObserver:self selector:@selector(applicationDidAddCurrentMenu:) name:NSMenuDidChangeItemNotification object:nil];
+    [nc addObserver:self selector:@selector(didChangeMenuItem:) name:NSMenuDidChangeItemNotification object:nil];
     [nc addObserver:self selector:@selector(applicationUnderMouseProjectName:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
     
-    [nc addObserver:self selector:@selector(applicationDidAddNowCurrentProjectName:) name:@"IDEIndexDidChangeStateNotification" object:nil];
+    [nc addObserver:self selector:@selector(didChangeStateOfIDEIndex:) name:@"IDEIndexDidChangeStateNotification" object:nil];
     
     [nc addObserver:self selector:@selector(sourceTextViewSelectionDidChange:) name:NSTextViewDidChangeSelectionNotification object:nil];
     
@@ -128,15 +129,15 @@ static Class IDEWorkspaceWindowControllerClass;
     [githubMenu addItem:clearDefault];
 }
 
-- (void)applicationDidAddCurrentMenu:(NSNotification *)noti {
-    LZLog();
+- (void)didChangeMenuItem:(NSNotification *)noti {
+    
 }
 
 - (void)applicationUnderMouseProjectName:(NSNotification *)noti {
-    LZLog();
+    
 }
 
-- (void)applicationDidAddNowCurrentProjectName:(NSNotification *)noti {
+- (void)didChangeStateOfIDEIndex:(NSNotification *)noti {
     LZLog();
 }
 
@@ -144,13 +145,7 @@ static Class IDEWorkspaceWindowControllerClass;
     id view = [notification object];
     if ([view isMemberOfClass:DVTSourceTextViewClass])
     {
-        NSString *sourceTextUntilSelection = [[view string] substringWithRange:NSMakeRange(0, [view selectedRange].location)];
-        self.selectionStartLineNumber = [[sourceTextUntilSelection componentsSeparatedByCharactersInSet:
-                                          [NSCharacterSet newlineCharacterSet]] count];
-        
-        NSString *sourceTextSelection = [[view string] substringWithRange:[view selectedRange]];
-        NSUInteger selectedLines = [[sourceTextSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] count];
-        self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 2 : 0);
+        self.sourceTextView = view;
     }
 }
 
@@ -208,6 +203,8 @@ static Class IDEWorkspaceWindowControllerClass;
         return;
     }
     
+    [self findSelection];
+    
     NSUInteger start = self.selectionStartLineNumber;
     NSUInteger end = self.selectionEndLineNumber;
     
@@ -217,78 +214,6 @@ static Class IDEWorkspaceWindowControllerClass;
         [path appendFormat:@"-L%ld", end];
     }
     [self openRepo:remoteRepoPath withPath:path];
-}
-
-// Performs a git command with given args in the given directory
-- (NSString *)outputGitWithArguments:(NSArray *)args inPath:(NSString *)path
-{
-    if (path.length == 0)
-    {
-        NSLog(@"Invalid path for git working directory.");
-        return nil;
-    }
-    
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = @"/usr/bin/xcrun";
-    task.currentDirectoryPath = path;
-    task.arguments = [@[@"git", @"--no-pager"] arrayByAddingObjectsFromArray:args];
-    task.standardOutput = [NSPipe pipe];
-    NSFileHandle *file = [task.standardOutput fileHandleForReading];
-    
-    [task launch];
-    
-    // For some reason [task waitUntilExit]; does not return sometimes. Therefore this rather hackish solution:
-    int count = 0;
-    while (task.isRunning && (count < 10))
-    {
-        [NSThread sleepForTimeInterval:0.1];
-        count++;
-    }
-    
-    NSString *output = [[NSString alloc] initWithData:[file readDataToEndOfFile] encoding:NSUTF8StringEncoding];
-    
-    return output;
-}
-
-- (NSString *)remotePathFromRemoteURL:(NSString *)remotePath {
-    // Check for SSH protocol
-    NSRange begin = [remotePath rangeOfString:@"git@"];
-    
-    if (begin.location == NSNotFound)
-    {
-        // SSH protocol not found, check for GIT protocol
-        begin = [remotePath rangeOfString:@"git://"];
-    }
-    if (begin.location == NSNotFound)
-    {
-        // HTTPS protocol check
-        begin = [remotePath rangeOfString:@"https://"];
-    }
-    if (begin.location == NSNotFound)
-    {
-        // HTTP protocol check
-        begin = [remotePath rangeOfString:@"http://"];
-    }
-    
-    NSRange end = [remotePath rangeOfString:@".git (fetch)"];
-    
-    if (end.location == NSNotFound)
-    {
-        // Alternate remote url end
-        end = [remotePath rangeOfString:@" (fetch)"];
-    }
-    
-    if ((begin.location != NSNotFound) &&
-        (end.location != NSNotFound))
-    {
-        NSUInteger githubURLBegin = begin.location + begin.length;
-        NSUInteger githubURLLength = end.location - githubURLBegin;
-        return [[remotePath
-          substringWithRange:NSMakeRange(githubURLBegin, githubURLLength)]
-         stringByReplacingOccurrencesOfString:@":" withString:@"/"];
-    } else {
-        return nil;
-    }
 }
 
 - (NSString *)remoteRepoPath {
@@ -444,6 +369,78 @@ static Class IDEWorkspaceWindowControllerClass;
     return [[NSUserDefaults standardUserDefaults] stringForKey:[self defaultRepoKey]];
 }
 
+// Performs a git command with given args in the given directory
+- (NSString *)outputGitWithArguments:(NSArray *)args inPath:(NSString *)path
+{
+    if (path.length == 0)
+    {
+        NSLog(@"Invalid path for git working directory.");
+        return nil;
+    }
+    
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = @"/usr/bin/xcrun";
+    task.currentDirectoryPath = path;
+    task.arguments = [@[@"git", @"--no-pager"] arrayByAddingObjectsFromArray:args];
+    task.standardOutput = [NSPipe pipe];
+    NSFileHandle *file = [task.standardOutput fileHandleForReading];
+    
+    [task launch];
+    
+    // For some reason [task waitUntilExit]; does not return sometimes. Therefore this rather hackish solution:
+    int count = 0;
+    while (task.isRunning && (count < 10))
+    {
+        [NSThread sleepForTimeInterval:0.1];
+        count++;
+    }
+    
+    NSString *output = [[NSString alloc] initWithData:[file readDataToEndOfFile] encoding:NSUTF8StringEncoding];
+    
+    return output;
+}
+
+- (NSString *)remotePathFromRemoteURL:(NSString *)remotePath {
+    // Check for SSH protocol
+    NSRange begin = [remotePath rangeOfString:@"git@"];
+    
+    if (begin.location == NSNotFound)
+    {
+        // SSH protocol not found, check for GIT protocol
+        begin = [remotePath rangeOfString:@"git://"];
+    }
+    if (begin.location == NSNotFound)
+    {
+        // HTTPS protocol check
+        begin = [remotePath rangeOfString:@"https://"];
+    }
+    if (begin.location == NSNotFound)
+    {
+        // HTTP protocol check
+        begin = [remotePath rangeOfString:@"http://"];
+    }
+    
+    NSRange end = [remotePath rangeOfString:@".git (fetch)"];
+    
+    if (end.location == NSNotFound)
+    {
+        // Alternate remote url end
+        end = [remotePath rangeOfString:@" (fetch)"];
+    }
+    
+    if ((begin.location != NSNotFound) &&
+        (end.location != NSNotFound))
+    {
+        NSUInteger githubURLBegin = begin.location + begin.length;
+        NSUInteger githubURLLength = end.location - githubURLBegin;
+        return [[remotePath
+                 substringWithRange:NSMakeRange(githubURLBegin, githubURLLength)]
+                stringByReplacingOccurrencesOfString:@":" withString:@"/"];
+    } else {
+        return nil;
+    }
+}
+
 #pragma mark - Clear Default Repo 
 
 - (void)clearDefaultRepo:(id)sender {
@@ -458,13 +455,32 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Open issues 
 
+- (NSTextCheckingResult *)checkingResultInString:(NSString *)string prefixes:(NSArray *)prefixes {
+    for (NSString *prefix in prefixes) {
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"%@#([0-9]*)", prefix] options:NSRegularExpressionCaseInsensitive error:nil];
+        NSTextCheckingResult *checking = [regex firstMatchInString:string options:0 range:NSMakeRange(0, string.length)];
+        if (checking) {
+            return checking;
+        }
+    }
+    return nil;
+}
+
 - (void)openIssues:(id)sender {
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         [self showMessage:@"Clould not find remote repo path"];
         return;
     }
-    [self openIssueAtIndex:0 remoteRepoPath:remoteRepoPath];
+    NSString *selectedLineString = [self selectedLineString];
+    
+    NSTextCheckingResult *checking = [self checkingResultInString:selectedLineString prefixes:@[@"issue", @"Issue", @"issues", @""]];
+    if (checking == nil) {
+         [self openIssueAtIndex:0 remoteRepoPath:remoteRepoPath];
+    } else {
+        NSInteger index = [[selectedLineString substringWithRange:[checking rangeAtIndex:1]] integerValue];
+        [self openIssueAtIndex:index remoteRepoPath:remoteRepoPath];
+    }
 }
 
 - (void)openIssueAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
@@ -483,7 +499,16 @@ static Class IDEWorkspaceWindowControllerClass;
         [self showMessage:@"Clould not find remote repo path"];
         return;
     }
-    [self openPRAtIndex:0 remoteRepoPath:remoteRepoPath];
+    
+    NSString *selectedLineString = [self selectedLineString];
+    
+    NSTextCheckingResult *checking = [self checkingResultInString:selectedLineString prefixes:@[@"PR", @"Pull Requests", @"pulls", @"pull", @"pr", @""]];
+    if (checking == nil) {
+        [self openPRAtIndex:0 remoteRepoPath:remoteRepoPath];
+    } else {
+        NSInteger index = [[selectedLineString substringWithRange:[checking rangeAtIndex:1]] integerValue];
+        [self openPRAtIndex:index remoteRepoPath:remoteRepoPath];
+    }
 }
 
 - (void)openPRAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
@@ -518,6 +543,32 @@ static Class IDEWorkspaceWindowControllerClass;
     NSString *path = [NSString stringWithFormat:@"/commits/%@/%@",
                               commitHash, filenameWithPathInCommit];
     [self openRepo:remoteRepoPath withPath:path];
+}
+
+- (void)findSelection {
+    if (self.sourceTextView == nil) {
+        return;
+    }
+    NSRange selectedRange = [self.sourceTextView selectedRange];
+    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
+    
+    self.selectionStartLineNumber = [[sourceTextUntilSelection componentsSeparatedByCharactersInSet:
+                                      [NSCharacterSet newlineCharacterSet]] count];
+    
+    NSString *sourceTextSelection = [[self.sourceTextView string] substringWithRange:selectedRange];
+    NSUInteger selectedLines = [[sourceTextSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] count];
+    self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 2 : 0);
+}
+
+- (NSString *)selectedLineString {
+    NSRange selectedRange = [self.sourceTextView selectedRange];
+    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
+    
+    NSArray *components = [sourceTextUntilSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    NSInteger selectedLineNumber = components.count;
+    
+    NSString *lineString = [[[self.sourceTextView string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] objectAtIndex:selectedLineNumber - 1];
+    return lineString;
 }
 
 @end
