@@ -192,13 +192,6 @@ static Class IDEWorkspaceWindowControllerClass;
 #pragma mark - Actions
 
 - (void)openBlame:(id)sender {
-    NSUInteger startLineNumber = self.selectionStartLineNumber;
-    NSUInteger endLineNumber = self.selectionEndLineNumber;
-    
-    NSURL *activeDocumentURL = [self activeDocument];
-    NSString *activeDocumentFullPath = [activeDocumentURL path];
-    NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
-    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         return;
@@ -208,16 +201,20 @@ static Class IDEWorkspaceWindowControllerClass;
     if (!commitHash) {
         return;
     }
-    
+
+    NSURL *activeDocumentURL = [self activeDocument];
     NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
     if (!filenameWithPathInCommit) {
         return;
     }
     
+    NSUInteger start = self.selectionStartLineNumber;
+    NSUInteger end = self.selectionEndLineNumber;
+    
     NSMutableString *path = [[NSString stringWithFormat:@"/blame/%@/%@#L%ld",
-                           commitHash, filenameWithPathInCommit, startLineNumber] mutableCopy];
-    if (startLineNumber != endLineNumber) {
-        [path appendFormat:@"-L%ld", endLineNumber];
+                           commitHash, filenameWithPathInCommit, start] mutableCopy];
+    if (start != end) {
+        [path appendFormat:@"-L%ld", end];
     }
     [self openRepo:remoteRepoPath withPath:path];
 }
