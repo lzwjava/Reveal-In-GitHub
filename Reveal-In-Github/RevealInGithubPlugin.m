@@ -17,6 +17,7 @@
 id objc_getClass(const char* name);
 
 NSString *const kRIGDefaultRepo = @"com.lzwjava.reveal-in-github.defaultRepo";
+NSString *const kRIGMenuToInsert = @"Navigate";
 
 static Class DVTSourceTextViewClass;
 static Class IDESourceCodeEditorClass;
@@ -66,9 +67,15 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Menu init
 
+- (BOOL)menuExists {
+    NSMenuItem *windowMenuItem = [[NSApp mainMenu] itemWithTitle:kRIGMenuToInsert];
+    NSMenuItem *menu = [windowMenuItem.submenu itemWithTitle:@"Reveal In Github"];
+    return menu != nil;
+}
+
 - (NSMenu *)githubMenu
 {
-    NSMenuItem *windowMenuItem = [[NSApp mainMenu] itemWithTitle:@"Window"];;
+    NSMenuItem *windowMenuItem = [[NSApp mainMenu] itemWithTitle:kRIGMenuToInsert];
     
     [[windowMenuItem submenu] addItem:[NSMenuItem separatorItem]];
     NSMenuItem *githubMenuItem = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Reveal In Github" action:NULL keyEquivalent:@""];
@@ -80,11 +87,13 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)noti {
-    // Application did finish launching is only send once. We do not need it anymore.
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc removeObserver:self
-                  name:NSApplicationDidFinishLaunchingNotification
-                object:NSApp];
+    [self addMenu];
+}
+
+- (void)addMenu {
+    if ([self menuExists]) {
+        return;
+    }
     
     NSMenu *githubMenu = [self githubMenu];
     
@@ -142,7 +151,11 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)didChangeMenuItem:(NSNotification *)noti {
-    
+    if ([[noti.object title] isEqualToString:kRIGMenuToInsert]) {
+        @synchronized(self) {
+            [self addMenu];
+        }
+    }
 }
 
 - (void)applicationUnderMouseProjectName:(NSNotification *)noti {
