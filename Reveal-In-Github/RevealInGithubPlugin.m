@@ -64,20 +64,7 @@ static Class IDEWorkspaceWindowControllerClass;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-#pragma mark - Notification
-
-- (void)addNotification {
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    [nc addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:nil];
-    [nc addObserver:self selector:@selector(didChangeMenuItem:) name:NSMenuDidChangeItemNotification object:nil];
-    [nc addObserver:self selector:@selector(applicationUnderMouseProjectName:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
-    
-    [nc addObserver:self selector:@selector(didChangeStateOfIDEIndex:) name:@"IDEIndexDidChangeStateNotification" object:nil];
-    
-    [nc addObserver:self selector:@selector(sourceTextViewSelectionDidChange:) name:NSTextViewDidChangeSelectionNotification object:nil];
-    
-    [nc addObserver:self selector:@selector(fetchActiveIDEWorkspaceWindow:) name:NSWindowDidUpdateNotification object:nil];
-}
+#pragma mark - Menu init
 
 - (NSMenu *)githubMenu
 {
@@ -134,6 +121,21 @@ static Class IDEWorkspaceWindowControllerClass;
     [githubMenu addItem:clearDefault];
 }
 
+#pragma mark - Notification and Selectors
+
+- (void)addNotification {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:nil];
+    [nc addObserver:self selector:@selector(didChangeMenuItem:) name:NSMenuDidChangeItemNotification object:nil];
+    [nc addObserver:self selector:@selector(applicationUnderMouseProjectName:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
+    
+    [nc addObserver:self selector:@selector(didChangeStateOfIDEIndex:) name:@"IDEIndexDidChangeStateNotification" object:nil];
+    
+    [nc addObserver:self selector:@selector(sourceTextViewSelectionDidChange:) name:NSTextViewDidChangeSelectionNotification object:nil];
+    
+    [nc addObserver:self selector:@selector(fetchActiveIDEWorkspaceWindow:) name:NSWindowDidUpdateNotification object:nil];
+}
+
 - (void)didChangeMenuItem:(NSNotification *)noti {
     
 }
@@ -143,7 +145,7 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)didChangeStateOfIDEIndex:(NSNotification *)noti {
-    LZLog();
+    
 }
 
 - (void)sourceTextViewSelectionDidChange:(NSNotification *)notification {
@@ -162,17 +164,7 @@ static Class IDEWorkspaceWindowControllerClass;
     }
 }
 
-+ (id)workspaceForWindow:(NSWindow *)window
-{
-    NSArray *workspaceWindowControllers = [NSClassFromString(@"IDEWorkspaceWindowController") valueForKey:@"workspaceWindowControllers"];
-    
-    for (id controller in workspaceWindowControllers) {
-        if ([[controller valueForKey:@"window"] isEqual:window]) {
-            return [controller valueForKey:@"_workspace"];
-        }
-    }
-    return nil;
-}
+#pragma mark - Xcode Part
 
 - (NSURL *)activeDocument
 {
@@ -189,36 +181,59 @@ static Class IDEWorkspaceWindowControllerClass;
     return nil;
 }
 
-#pragma mark - Actions
+- (void)showMessage:(NSString *)message {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"OK"];
+    [alert setMessageText: message];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert runModal];
+}
 
-- (void)openBlame:(id)sender {
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
+- (void)findSelection {
+    if (self.sourceTextView == nil) {
         return;
     }
+    NSRange selectedRange = [self.sourceTextView selectedRange];
+    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
     
-    NSString *commitHash = [self lastestCommitHash];
-    if (!commitHash) {
-        return;
-    }
+    self.selectionStartLineNumber = [[sourceTextUntilSelection componentsSeparatedByCharactersInSet:
+                                      [NSCharacterSet newlineCharacterSet]] count];
+    
+    NSString *sourceTextSelection = [[self.sourceTextView string] substringWithRange:selectedRange];
+    NSUInteger selectedLines = [[sourceTextSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] count];
+    self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 2 : 0);
+}
 
-    NSURL *activeDocumentURL = [self activeDocument];
-    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
-    if (!filenameWithPathInCommit) {
-        return;
-    }
+- (NSString *)selectedLineString {
+    NSRange selectedRange = [self.sourceTextView selectedRange];
+    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
     
-    [self findSelection];
+    NSArray *components = [sourceTextUntilSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    NSInteger selectedLineNumber = components.count;
     
-    NSUInteger start = self.selectionStartLineNumber;
-    NSUInteger end = self.selectionEndLineNumber;
-    
-    NSMutableString *path = [NSMutableString stringWithFormat:@"/blame/%@/%@#L%ld",
-                           commitHash, filenameWithPathInCommit, start];
-    if (start != end) {
-        [path appendFormat:@"-L%ld", end];
-    }
-    [self openRepo:remoteRepoPath withPath:path];
+    NSString *lineString = [[[self.sourceTextView string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] objectAtIndex:selectedLineNumber - 1];
+    return lineString;
+}
+
+#pragma mark - Remote Repo
+
+- (NSString *)defaultRepoKey {
+    NSString *gitPath = [self gitRootPath];
+    return [NSString stringWithFormat:@"%@:%@", kRIGDefaultRepo, gitPath];
+}
+
+- (void)setDefaultRepo:(NSString *)defaultRepo {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setObject:defaultRepo forKey:[self defaultRepoKey]];
+}
+
+- (void)removeDefaultRepo {
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud removeObjectForKey:[self defaultRepoKey]];
+}
+
+- (NSString *)defaultRepo {
+    return [[NSUserDefaults standardUserDefaults] stringForKey:[self defaultRepoKey]];
 }
 
 - (NSString *)remoteRepoPath {
@@ -285,6 +300,9 @@ static Class IDEWorkspaceWindowControllerClass;
     
 }
 
+
+#pragma mark - Git Utils
+
 - (NSString *)filenameWithPathInCommit:(NSString *)commitHash forActiveDocumentURL:(NSURL *)activeDocumentURL {
     NSArray *args = @[@"show", @"--name-only", @"--pretty=format:", commitHash];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
@@ -309,24 +327,6 @@ static Class IDEWorkspaceWindowControllerClass;
     
     return filenameWithPathInCommit;
 }
-
-#pragma mark - Xcode Interactive
-
-- (void)openRepo:(NSString *)repo withPath:(NSString *)path {
-    NSString *secureBaseUrl = [NSString stringWithFormat:@"https://%@", repo];
-    NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
-    [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
-}
-
-- (void)showMessage:(NSString *)message {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"OK"];
-    [alert setMessageText: message];
-    [alert setAlertStyle:NSWarningAlertStyle];
-    [alert runModal];
-}
-
-#pragma mark - Git Utils
 
 - (NSString *)lastestCommitHash {
     NSURL *activeDocumentURL = [self activeDocument];
@@ -354,25 +354,6 @@ static Class IDEWorkspaceWindowControllerClass;
     NSArray *args = @[@"rev-parse", @"--show-toplevel"];
     NSString *rootPath = [self outputGitWithArguments:args inPath:activeDocumentDirectoryPath];
     return [rootPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-}
-
-- (NSString *)defaultRepoKey {
-    NSString *gitPath = [self gitRootPath];
-    return [NSString stringWithFormat:@"%@:%@", kRIGDefaultRepo, gitPath];
-}
-
-- (void)setDefaultRepo:(NSString *)defaultRepo {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:defaultRepo forKey:[self defaultRepoKey]];
-}
-
-- (void)removeDefaultRepo {
-    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    [ud removeObjectForKey:[self defaultRepoKey]];
-}
-
-- (NSString *)defaultRepo {
-    return [[NSUserDefaults standardUserDefaults] stringForKey:[self defaultRepoKey]];
 }
 
 // Performs a git command with given args in the given directory
@@ -447,6 +428,13 @@ static Class IDEWorkspaceWindowControllerClass;
     }
 }
 
+- (void)openRepo:(NSString *)repo withPath:(NSString *)path {
+    NSString *secureBaseUrl = [NSString stringWithFormat:@"https://%@", repo];
+    NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
+    [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
+}
+
+
 #pragma mark - Clear Default Repo 
 
 - (void)clearDefaultRepo:(id)sender {
@@ -457,6 +445,38 @@ static Class IDEWorkspaceWindowControllerClass;
         [self removeDefaultRepo];
         [self showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open blame in github, will ask you to select new default repo.", defaultRepo]];
     }
+}
+
+#pragma mark - Open Blame
+
+- (void)openBlame:(id)sender {
+    NSString *remoteRepoPath = [self remoteRepoPath];
+    if (!remoteRepoPath) {
+        return;
+    }
+    
+    NSString *commitHash = [self lastestCommitHash];
+    if (!commitHash) {
+        return;
+    }
+    
+    NSURL *activeDocumentURL = [self activeDocument];
+    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
+    if (!filenameWithPathInCommit) {
+        return;
+    }
+    
+    [self findSelection];
+    
+    NSUInteger start = self.selectionStartLineNumber;
+    NSUInteger end = self.selectionEndLineNumber;
+    
+    NSMutableString *path = [NSMutableString stringWithFormat:@"/blame/%@/%@#L%ld",
+                             commitHash, filenameWithPathInCommit, start];
+    if (start != end) {
+        [path appendFormat:@"-L%ld", end];
+    }
+    [self openRepo:remoteRepoPath withPath:path];
 }
 
 #pragma mark - Open issues 
@@ -577,32 +597,6 @@ static Class IDEWorkspaceWindowControllerClass;
         path = [path stringByAppendingFormat:@"-L%ld", self.selectionEndLineNumber];
     }
     [self openRepo:remoteRepoPath withPath:path];
-}
-
-- (void)findSelection {
-    if (self.sourceTextView == nil) {
-        return;
-    }
-    NSRange selectedRange = [self.sourceTextView selectedRange];
-    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
-    
-    self.selectionStartLineNumber = [[sourceTextUntilSelection componentsSeparatedByCharactersInSet:
-                                      [NSCharacterSet newlineCharacterSet]] count];
-    
-    NSString *sourceTextSelection = [[self.sourceTextView string] substringWithRange:selectedRange];
-    NSUInteger selectedLines = [[sourceTextSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] count];
-    self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 2 : 0);
-}
-
-- (NSString *)selectedLineString {
-    NSRange selectedRange = [self.sourceTextView selectedRange];
-    NSString *sourceTextUntilSelection = [[self.sourceTextView string] substringWithRange:NSMakeRange(0, selectedRange.location)];
-    
-    NSArray *components = [sourceTextUntilSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    NSInteger selectedLineNumber = components.count;
-    
-    NSString *lineString = [[[self.sourceTextView string] componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] objectAtIndex:selectedLineNumber - 1];
-    return lineString;
 }
 
 @end
