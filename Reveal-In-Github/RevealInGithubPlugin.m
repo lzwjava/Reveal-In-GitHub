@@ -379,7 +379,7 @@ static Class IDEWorkspaceWindowControllerClass;
 {
     if (path.length == 0)
     {
-        NSLog(@"Invalid path for git working directory.");
+        [self showMessage:@"Invalid path for git working directory."];
         return nil;
     }
     
