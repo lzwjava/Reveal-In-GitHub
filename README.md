@@ -7,10 +7,10 @@ The whole screenshot of the plugin:
 
 It has six menu item:
 
- Name           | ShortCut              | Github URL Pattern               
+ Name           | Shortcut              | Github URL Pattern               
 ----------------|-----------------------|----------------------------------
  Repo           |Command+Control+Shift+R|https://github.com/lzwjava/LZAlbum
- Quick File     |Command+Control+Shift+Q|https://github.com/lzwjava/LZAlbum
+ Quick File     |Command+Control+Shift+Q|https://github.com/lzwjava/LZAlbum/blob/fd7224d/LZAlbum/manager/LZAlbumManager.m#L40
  List History   |Command+Control+Shift+L|https://github.com/lzwjava/LZAlbum
  Blame          |Command+Control+Shift+B|https://github.com/lzwjava/LZAlbum
  Issues         |Command+Control+Shift+I|https://github.com/lzwjava/LZAlbum
