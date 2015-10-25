@@ -10,10 +10,10 @@ It has six menu item:
  Name           | Shortcut              | Github URL Pattern               
 ----------------|-----------------------|----------------------------------
  Repo           |Command+Control+Shift+R|https://github.com/lzwjava/LZAlbum
- Quick File     |Command+Control+Shift+Q|https://github.com/lzwjava/LZAlbum/blob/fd7224d/LZAlbum/manager/LZAlbumManager.m#L40
- List History   |Command+Control+Shift+L|https://github.com/lzwjava/LZAlbum
- Blame          |Command+Control+Shift+B|https://github.com/lzwjava/LZAlbum
- Issues         |Command+Control+Shift+I|https://github.com/lzwjava/LZAlbum
- PRs            |Command+Control+Shift+P|https://github.com/lzwjava/LZAlbum
+ Quick File     |Command+Control+Shift+Q|https://github.com/lzwjava/LZAlbum/blob/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
+ List History   |Command+Control+Shift+L|https://github.com/lzwjava/LZAlbum/commits/fd7224/LZAlbum/manager/LZAlbumManager.m
+ Blame          |Command+Control+Shift+B|https://github.com/lzwjava/LZAlbum/blame/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
+ Issues         |Command+Control+Shift+I|https://github.com/lzwjava/LZAlbum/issues
+ PRs            |Command+Control+Shift+P|https://github.com/lzwjava/LZAlbum/pulls
  Clear Defaults |                       |                                  
 
