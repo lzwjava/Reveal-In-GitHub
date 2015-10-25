@@ -102,6 +102,18 @@ static Class IDEWorkspaceWindowControllerClass;
     repo.target = self;
     [githubMenu addItem:repo];
     
+    NSMenuItem *issue = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Issues" action:@selector(openIssues:) keyEquivalent:@"I"];
+    [issue setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
+    issue.target = self;
+    [githubMenu addItem:issue];
+    
+    NSMenuItem *PR = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"PRs" action:@selector(openPRs:) keyEquivalent:@"P"];
+    [PR setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
+     ];
+    PR.target = self;
+    [githubMenu addItem:PR];
+    
     NSMenuItem *file = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Quick File" action:@selector(openFile:) keyEquivalent:@"Q"];
     [file setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
     file.target = self;
@@ -117,18 +129,6 @@ static Class IDEWorkspaceWindowControllerClass;
      ];
     blame.target = self;
     [githubMenu addItem:blame];
-    
-    NSMenuItem *issue = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Issues" action:@selector(openIssues:) keyEquivalent:@"I"];
-    [issue setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    issue.target = self;
-    [githubMenu addItem:issue];
-    
-    NSMenuItem *PR = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"PRs" action:@selector(openPRs:) keyEquivalent:@"P"];
-    [PR setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    PR.target = self;
-    [githubMenu addItem:PR];
     
     NSMenuItem *clearDefault = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Clear Defaults" action:@selector(clearDefaultRepo:) keyEquivalent:@""];
     clearDefault.target = self;

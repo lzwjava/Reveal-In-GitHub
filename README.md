@@ -5,15 +5,15 @@ My company work on Github. I open the Github all day long. Sometimes, I am editi
 The whole screenshot of the plugin:
 ![plugin](https://cloud.githubusercontent.com/assets/5022872/10716151/36ce0394-7b6a-11e5-82a3-fe55532c4e8b.png)
 
-It has six menu item:
+It has six menu items:
 
  Name           | Shortcut              | Github URL Pattern               
 ----------------|-----------------------|----------------------------------
  Repo           |Command+Control+Shift+R|https://github.com/lzwjava/LZAlbum
+ Issues         |Command+Control+Shift+I|https://github.com/lzwjava/LZAlbum/issues
+ PRs            |Command+Control+Shift+P|https://github.com/lzwjava/LZAlbum/pulls
  Quick File     |Command+Control+Shift+Q|https://github.com/lzwjava/LZAlbum/blob/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
  List History   |Command+Control+Shift+L|https://github.com/lzwjava/LZAlbum/commits/fd7224/LZAlbum/manager/LZAlbumManager.m
  Blame          |Command+Control+Shift+B|https://github.com/lzwjava/LZAlbum/blame/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
- Issues         |Command+Control+Shift+I|https://github.com/lzwjava/LZAlbum/issues
- PRs            |Command+Control+Shift+P|https://github.com/lzwjava/LZAlbum/pulls
  Clear Defaults |                       |                                  
 
