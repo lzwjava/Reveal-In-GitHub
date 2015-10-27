@@ -17,7 +17,7 @@
 id objc_getClass(const char* name);
 
 NSString *const kRIGDefaultRepo = @"com.lzwjava.reveal-in-github.defaultRepo";
-NSString *const kRIGMenuToInsert = @"Navigate";
+NSString *const kRIGMenuToInsert = @"Window";
 
 static Class DVTSourceTextViewClass;
 static Class IDESourceCodeEditorClass;
@@ -151,11 +151,11 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)didChangeMenuItem:(NSNotification *)noti {
-    if ([[noti.object title] isEqualToString:kRIGMenuToInsert]) {
-        @synchronized(self) {
-            [self addMenu];
-        }
-    }
+//    if ([[noti.object title] isEqualToString:kRIGMenuToInsert]) {
+//        @synchronized(self) {
+//            [self addMenu];
+//        }
+//    }
 }
 
 - (void)applicationUnderMouseProjectName:(NSNotification *)noti {
@@ -310,7 +310,7 @@ static Class IDEWorkspaceWindowControllerClass;
     
     if (selectedRemotePath.length == 0)
     {
-        [self showMessage:@"Unable to find github remote URL."];
+        LZLog(@"Unable to find github remote URL.");
         return nil;
     }
     
@@ -339,7 +339,7 @@ static Class IDEWorkspaceWindowControllerClass;
     
     if (!filenameWithPathInCommit)
     {
-        [self showMessage:@"Unable to find file in commit."];
+        LZLog(@"Unable to find file in commit.");
         return nil;
     }
     
@@ -379,7 +379,7 @@ static Class IDEWorkspaceWindowControllerClass;
 {
     if (path.length == 0)
     {
-        [self showMessage:@"Invalid path for git working directory."];
+        LZLog(@"Invalid path for git working directory.");
         return nil;
     }
     
@@ -465,9 +465,29 @@ static Class IDEWorkspaceWindowControllerClass;
     }
 }
 
+#pragma mark - Check 
+
+- (BOOL)isValidGitRepo {
+    NSURL *activeDocument = [self activeDocument];
+    if (activeDocument == nil) {
+        [self showMessage:@"No file is opening now."];
+        return NO;
+    }
+    NSString *gitPath = [self gitRootPath];
+    if (!gitPath) {
+        [self showMessage:@"Could not get git repo from current file."];
+        return NO;
+    }
+    return YES;
+}
+
 #pragma mark - Open Blame
 
 - (void)openBlame:(id)sender {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         return;
@@ -511,6 +531,10 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)openIssues:(id)sender {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         [self showMessage:@"Clould not find remote repo path"];
@@ -538,6 +562,10 @@ static Class IDEWorkspaceWindowControllerClass;
 #pragma mark - Open PRs
 
 - (void)openPRs:(id)sender {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         [self showMessage:@"Clould not find remote repo path"];
@@ -568,6 +596,10 @@ static Class IDEWorkspaceWindowControllerClass;
 #pragma mark - Open History
 
 - (void)openHistory:(id)sender {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         return;
@@ -592,6 +624,10 @@ static Class IDEWorkspaceWindowControllerClass;
 #pragma mark - Open File
 
 - (void)openFile:(id)sender {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
     NSString *remoteRepoPath = [self remoteRepoPath];
     if (!remoteRepoPath) {
         return;
