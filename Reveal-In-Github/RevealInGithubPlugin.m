@@ -7,6 +7,7 @@
 //
 
 #import "RevealInGithubPlugin.h"
+#import "RIGSettingWindowController.h"
 
 #ifdef DEBUG
 #   define LZLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -130,9 +131,10 @@ static Class IDEWorkspaceWindowControllerClass;
     blame.target = self;
     [githubMenu addItem:blame];
     
-    NSMenuItem *clearDefault = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Clear Defaults" action:@selector(clearDefaultRepo:) keyEquivalent:@""];
-    clearDefault.target = self;
-    [githubMenu addItem:clearDefault];
+    NSMenuItem *settings = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Settings" action:@selector(showSettingWindow:) keyEquivalent:@"S"];
+    [settings setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
+    settings.target = self;
+    [githubMenu addItem:settings];
 }
 
 #pragma mark - Notification and Selectors
@@ -661,6 +663,13 @@ static Class IDEWorkspaceWindowControllerClass;
         return;
     }
     [self openRepo:remoteRepoPath withPath:@""];
+}
+
+#pragma mark - Show Settings
+
+- (void)showSettingWindow:(id)sender {
+    RIGSettingWindowController *controller = [[RIGSettingWindowController alloc] initWithWindowNibName:@"RIGSettingWindowController"];
+    [controller showWindow:self];
 }
 
 @end

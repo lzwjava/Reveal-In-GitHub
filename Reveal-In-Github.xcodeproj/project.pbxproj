@@ -10,6 +10,9 @@
 		705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */; settings = {ASSET_TAGS = (); }; };
 		70DE90B11BD932D300E29A15 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B01BD932D300E29A15 /* Cocoa.framework */; };
 		70DE90B31BD932D800E29A15 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B21BD932D800E29A15 /* Foundation.framework */; };
+		70FD6DE51BDFE48500897138 /* RIGSettingWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70FD6DE31BDFE48500897138 /* RIGSettingWindowController.m */; settings = {ASSET_TAGS = (); }; };
+		70FD6DE61BDFE48500897138 /* RIGSettingWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70FD6DE41BDFE48500897138 /* RIGSettingWindowController.xib */; settings = {ASSET_TAGS = (); }; };
+		70FD6DEC1BDFF86B00897138 /* RIGConfigCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70FD6DEB1BDFF86B00897138 /* RIGConfigCellView.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +22,11 @@
 		705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RevealInGithubPlugin.h; sourceTree = "<group>"; };
 		70DE90B01BD932D300E29A15 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		70DE90B21BD932D800E29A15 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		70FD6DE21BDFE48500897138 /* RIGSettingWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGSettingWindowController.h; sourceTree = "<group>"; };
+		70FD6DE31BDFE48500897138 /* RIGSettingWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGSettingWindowController.m; sourceTree = "<group>"; };
+		70FD6DE41BDFE48500897138 /* RIGSettingWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RIGSettingWindowController.xib; sourceTree = "<group>"; };
+		70FD6DEA1BDFF86B00897138 /* RIGConfigCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGConfigCellView.h; sourceTree = "<group>"; };
+		70FD6DEB1BDFF86B00897138 /* RIGConfigCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGConfigCellView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +63,11 @@
 		705EEF521BD80FB900A29083 /* Reveal-In-Github */ = {
 			isa = PBXGroup;
 			children = (
+				70FD6DEA1BDFF86B00897138 /* RIGConfigCellView.h */,
+				70FD6DEB1BDFF86B00897138 /* RIGConfigCellView.m */,
+				70FD6DE21BDFE48500897138 /* RIGSettingWindowController.h */,
+				70FD6DE31BDFE48500897138 /* RIGSettingWindowController.m */,
+				70FD6DE41BDFE48500897138 /* RIGSettingWindowController.xib */,
 				705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */,
 				705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */,
 				705EEF531BD80FB900A29083 /* Info.plist */,
@@ -118,6 +131,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70FD6DE61BDFE48500897138 /* RIGSettingWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +143,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */,
+				70FD6DEC1BDFF86B00897138 /* RIGConfigCellView.m in Sources */,
+				70FD6DE51BDFE48500897138 /* RIGSettingWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
