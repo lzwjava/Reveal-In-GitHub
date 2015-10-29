@@ -33,6 +33,8 @@ static Class IDEWorkspaceWindowControllerClass;
 @property (nonatomic, assign) NSUInteger selectionEndLineNumber;
 @property (nonatomic, assign) BOOL useHTTPS;
 
+@property (nonatomic, strong) NSWindowController *setttingController;
+
 @end
 
 @implementation RevealInGithubPlugin
@@ -668,8 +670,8 @@ static Class IDEWorkspaceWindowControllerClass;
 #pragma mark - Show Settings
 
 - (void)showSettingWindow:(id)sender {
-    RIGSettingWindowController *controller = [[RIGSettingWindowController alloc] initWithWindowNibName:@"RIGSettingWindowController"];
-    [controller showWindow:self];
+    self.setttingController = [[RIGSettingWindowController alloc] initWithWindowNibName:@"RIGSettingWindowController"];
+    [self.setttingController showWindow:self];
 }
 
 @end

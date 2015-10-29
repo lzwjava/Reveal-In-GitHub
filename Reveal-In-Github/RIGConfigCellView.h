@@ -7,11 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "RIGConfig.h"
 
-@interface RIGConfigCellView : NSTableCellView
+@interface RIGConfigCellView : NSView
 
-@property (weak) IBOutlet NSTextField *menuTitleField;
-@property (weak) IBOutlet NSTextField *lastKeyField;
-@property (weak) IBOutlet NSTextField *patternField;
+@property (nonatomic, strong) RIGConfig *config;
+
+- (void)reloadData;
 
 @end
