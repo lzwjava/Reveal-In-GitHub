@@ -6,8 +6,9 @@
 //  Copyright © 2015年 lzwjava. All rights reserved.
 //
 
-#import "RevealInGithubPlugin.h"
+#import "RIGPlugin.h"
 #import "RIGSettingWindowController.h"
+#import "RIGConfig.h"
 
 #ifdef DEBUG
 #   define LZLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
@@ -17,15 +18,16 @@
 
 id objc_getClass(const char* name);
 
-NSString *const kRIGDefaultRepo = @"com.lzwjava.reveal-in-github.defaultRepo";
-NSString *const kRIGMenuToInsert = @"Window";
+#define kRIGDefaultRepo @"com.lzwjava.reveal-in-github.defaultRepo"
+#define kRIGConfigs @"com.lzwjava.reveal-in-github.configs"
+#define kRIGMenuToInsert @"Window"
 
 static Class DVTSourceTextViewClass;
 static Class IDESourceCodeEditorClass;
 static Class IDEApplicationClass;
 static Class IDEWorkspaceWindowControllerClass;
 
-@interface RevealInGithubPlugin()
+@interface RIGPlugin()
 
 @property (nonatomic, strong) id ideWorkspaceWindow;
 @property (nonatomic, strong) id sourceTextView;
@@ -37,7 +39,7 @@ static Class IDEWorkspaceWindowControllerClass;
 
 @end
 
-@implementation RevealInGithubPlugin
+@implementation RIGPlugin
 
 + (void)pluginDidLoad:(NSBundle *)plugin {
     DVTSourceTextViewClass = objc_getClass("DVTSourceTextView");
@@ -48,14 +50,15 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 #pragma mark - init
-- (instancetype)init{
+
+- (instancetype)init {
     if (self = [super init]) {
         [self addNotification];
     }
     return self;
 }
 
-+ (instancetype)shared{
++ (instancetype)shared {
     static dispatch_once_t onceToken;
     static id instance = nil;
     dispatch_once(&onceToken, ^{
@@ -459,7 +462,7 @@ static Class IDEWorkspaceWindowControllerClass;
 
 #pragma mark - Clear Default Repo 
 
-- (void)clearDefaultRepo:(id)sender {
+- (void)clearDefaultRepo {
     NSString *defaultRepo = [self defaultRepo];
     if (defaultRepo == nil) {
         [self showMessage:@"There's no default repo setting."];
@@ -671,7 +674,43 @@ static Class IDEWorkspaceWindowControllerClass;
 
 - (void)showSettingWindow:(id)sender {
     self.setttingController = [[RIGSettingWindowController alloc] initWithWindowNibName:@"RIGSettingWindowController"];
-    [self.setttingController showWindow:self];
+    [self.setttingController showWindow:self.setttingController];
+}
+
+- (NSArray *)defaultConfigs {
+    RIGConfig *config1= [[RIGConfig alloc] init];
+    config1.menuTitle = @"Notification";
+    config1.lastKey = @"N";
+    config1.pattern = @"{{git_remote_url}}/notifications?all=1";
+    
+    RIGConfig *config2= [[RIGConfig alloc] init];
+    config2.menuTitle = @"";
+    config2.lastKey = @"";
+    config2.pattern = @"";
+    
+    RIGConfig *config3 = [[RIGConfig alloc] init];
+    config3.menuTitle = @"";
+    config3.lastKey = @"";
+    config3.pattern = @"";
+    
+    NSArray *configs = @[config3, config2, config1];
+    return configs;
+}
+
+- (NSArray *)localConfigs {
+    NSArray *configs = [[NSUserDefaults standardUserDefaults] objectForKey:kRIGConfigs];
+    if (configs == nil) {
+        configs = [self defaultConfigs];
+    }
+    return configs;
+}
+
+- (void)saveConfigs:(NSArray *)configs {
+    NSMutableArray *dicts = [NSMutableArray array];
+    for (RIGConfig *config in configs) {
+        [dicts addObject:[config dictionary]];
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:dicts forKey:kRIGConfigs];
 }
 
 @end

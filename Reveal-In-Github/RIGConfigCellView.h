@@ -11,7 +11,13 @@
 
 @interface RIGConfigCellView : NSView
 
+@property (nonatomic, strong) NSTextField *menuTitleField;
+@property (nonatomic, strong) NSTextField *lastKeyField;
+@property (nonatomic, strong) NSTextField *patternField;
+
 @property (nonatomic, strong) RIGConfig *config;
+
++ (CGFloat)heightForCellView;
 
 - (void)reloadData;
 

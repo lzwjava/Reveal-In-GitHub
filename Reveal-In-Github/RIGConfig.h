@@ -10,8 +10,11 @@
 
 @interface RIGConfig : NSObject
 
-@property (nonatomic, copy) NSString *menuTitle;
-@property (nonatomic, copy) NSString *lastKey;
-@property (nonatomic, copy) NSString *pattern;
+@property (nonatomic, strong) NSString *menuTitle;
+@property (nonatomic, strong) NSString *lastKey;
+@property (nonatomic, strong) NSString *pattern;
+
+- (instancetype)initWithDictionary:(NSDictionary *)dict;
+- (NSDictionary *)dictionary;
 
 @end

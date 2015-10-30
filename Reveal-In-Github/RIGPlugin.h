@@ -8,6 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface RevealInGithubPlugin : NSObject
+@interface RIGPlugin : NSObject
+
++ (instancetype)shared;
+
+- (void)clearDefaultRepo;
+- (NSArray *)localConfigs;
+- (void)saveConfigs:(NSArray *)configs;
 
 @end

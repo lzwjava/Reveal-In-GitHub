@@ -7,10 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */; };
-		70AF99371BE119DF0091F46F /* RIGConfigCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70AF99361BE119DF0091F46F /* RIGConfigCellView.xib */; };
-		70AF99391BE12F6B0091F46F /* RIGTestView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70AF99381BE12F6B0091F46F /* RIGTestView.xib */; };
-		70AF993C1BE1320C0091F46F /* RIGTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70AF993B1BE1320C0091F46F /* RIGTestView.m */; };
+		7059A1891BE3AEBF00D9FBC5 /* RIGConfigCellsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7059A1881BE3AEBF00D9FBC5 /* RIGConfigCellsView.m */; };
+		705EEF5B1BD8100800A29083 /* RIGPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EEF591BD8100800A29083 /* RIGPlugin.m */; };
 		70DDFEA71BE10642000406D2 /* RIGConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DDFEA61BE10642000406D2 /* RIGConfig.m */; };
 		70DE90B11BD932D300E29A15 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B01BD932D300E29A15 /* Cocoa.framework */; };
 		70DE90B31BD932D800E29A15 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B21BD932D800E29A15 /* Foundation.framework */; };
@@ -20,14 +18,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7059A1871BE3AEBF00D9FBC5 /* RIGConfigCellsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGConfigCellsView.h; sourceTree = "<group>"; };
+		7059A1881BE3AEBF00D9FBC5 /* RIGConfigCellsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGConfigCellsView.m; sourceTree = "<group>"; };
 		705EEF501BD80FB900A29083 /* Reveal-In-Github.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Reveal-In-Github.xcplugin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		705EEF531BD80FB900A29083 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RevealInGithubPlugin.m; sourceTree = "<group>"; };
-		705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RevealInGithubPlugin.h; sourceTree = "<group>"; };
-		70AF99361BE119DF0091F46F /* RIGConfigCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RIGConfigCellView.xib; sourceTree = "<group>"; };
-		70AF99381BE12F6B0091F46F /* RIGTestView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RIGTestView.xib; sourceTree = "<group>"; };
-		70AF993A1BE1320C0091F46F /* RIGTestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGTestView.h; sourceTree = "<group>"; };
-		70AF993B1BE1320C0091F46F /* RIGTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGTestView.m; sourceTree = "<group>"; };
+		705EEF591BD8100800A29083 /* RIGPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGPlugin.m; sourceTree = "<group>"; };
+		705EEF5A1BD8100800A29083 /* RIGPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGPlugin.h; sourceTree = "<group>"; };
 		70DDFEA51BE10642000406D2 /* RIGConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGConfig.h; sourceTree = "<group>"; };
 		70DDFEA61BE10642000406D2 /* RIGConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGConfig.m; sourceTree = "<group>"; };
 		70DE90B01BD932D300E29A15 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -77,15 +73,13 @@
 				70DDFEA61BE10642000406D2 /* RIGConfig.m */,
 				70FD6DEA1BDFF86B00897138 /* RIGConfigCellView.h */,
 				70FD6DEB1BDFF86B00897138 /* RIGConfigCellView.m */,
-				70AF99361BE119DF0091F46F /* RIGConfigCellView.xib */,
-				70AF99381BE12F6B0091F46F /* RIGTestView.xib */,
-				70AF993A1BE1320C0091F46F /* RIGTestView.h */,
-				70AF993B1BE1320C0091F46F /* RIGTestView.m */,
+				7059A1871BE3AEBF00D9FBC5 /* RIGConfigCellsView.h */,
+				7059A1881BE3AEBF00D9FBC5 /* RIGConfigCellsView.m */,
 				70FD6DE21BDFE48500897138 /* RIGSettingWindowController.h */,
 				70FD6DE31BDFE48500897138 /* RIGSettingWindowController.m */,
 				70FD6DE41BDFE48500897138 /* RIGSettingWindowController.xib */,
-				705EEF5A1BD8100800A29083 /* RevealInGithubPlugin.h */,
-				705EEF591BD8100800A29083 /* RevealInGithubPlugin.m */,
+				705EEF5A1BD8100800A29083 /* RIGPlugin.h */,
+				705EEF591BD8100800A29083 /* RIGPlugin.m */,
 				705EEF531BD80FB900A29083 /* Info.plist */,
 			);
 			path = "Reveal-In-Github";
@@ -148,8 +142,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				70FD6DE61BDFE48500897138 /* RIGSettingWindowController.xib in Resources */,
-				70AF99371BE119DF0091F46F /* RIGConfigCellView.xib in Resources */,
-				70AF99391BE12F6B0091F46F /* RIGTestView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,10 +152,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				705EEF5B1BD8100800A29083 /* RevealInGithubPlugin.m in Sources */,
+				705EEF5B1BD8100800A29083 /* RIGPlugin.m in Sources */,
 				70FD6DEC1BDFF86B00897138 /* RIGConfigCellView.m in Sources */,
-				70AF993C1BE1320C0091F46F /* RIGTestView.m in Sources */,
 				70DDFEA71BE10642000406D2 /* RIGConfig.m in Sources */,
+				7059A1891BE3AEBF00D9FBC5 /* RIGConfigCellsView.m in Sources */,
 				70FD6DE51BDFE48500897138 /* RIGSettingWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

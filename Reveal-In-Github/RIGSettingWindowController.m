@@ -7,57 +7,46 @@
 //
 
 #import "RIGSettingWindowController.h"
-#import "RIGConfigCellView.h"
+#import "RIGConfigCellsView.h"
+#import "RIGConfig.h"
+#import "RIGPlugin.h"
+
+#define kOutterXMargin 30
+#define kOutterYMargin 0
 
 @interface RIGSettingWindowController ()<NSTableViewDataSource, NSTableViewDelegate>
 
-@property (weak) IBOutlet NSTableView *tableView;
-
 @property (nonatomic, strong) NSArray *configs;
+@property (nonatomic, strong) RIGConfigCellsView *configCellsView;
+@property (weak) IBOutlet NSView *mainView;
+@property (weak) IBOutlet NSView *configsView;
 
 @end
 
 @implementation RIGSettingWindowController
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
 }
 
 - (void)windowDidLoad {
     [super windowDidLoad];
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
-//    
-//    NSNib *nib = [[NSNib alloc] initWithNibNamed:@"RIGConfigCellView" bundle:[NSBundle mainBundle]];
-//    [self.tableView registerNib:nib forIdentifier:@"MainCell"];
-//    
-    NSNib *testNib = [[NSNib alloc] initWithNibNamed:@"RIGTestView" bundle:[NSBundle mainBundle]];
-    [self.tableView registerNib:testNib forIdentifier:@"tesNib"];
     
-//    RIGConfig *config= [[RIGConfig alloc] init];
-//    config.menuTitle = @"Notification";
-//    config.lastKey = @"N";
-//    config.pattern = @"{{git_remote_url}}/notifications?all=1";
-//    self.configs = @[config];
-//    [self.tableView reloadData];
+    self.configs = [[RIGPlugin shared] localConfigs];
+    self.configCellsView = [[RIGConfigCellsView alloc] initWithFrame:CGRectMake(kOutterXMargin, kOutterYMargin, CGRectGetWidth(self.window.frame) - 2 * kOutterXMargin, [RIGConfigCellsView heightForConfigs:self.configs])];
+    self.configCellsView.configs = self.configs;
+    [self.configsView addSubview:self.configCellsView];
+    [self.configCellsView reloadData];
 }
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    return self.configs.count;
+- (IBAction)saveButtonClcked:(id)sender {
+    [[RIGPlugin shared] saveConfigs:self.configCellsView.configs];
 }
 
-- (nullable id)tableView:(NSTableView *)tableView objectValueForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    RIGConfigCellView *configCell = [tableView makeViewWithIdentifier:@"MainCell" owner:self];
-    configCell.config = self.configs[row];
-    [configCell reloadData];
-    return configCell;
-}
-
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)tableView {
-    return NO;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldEditTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    return NO;
+- (IBAction)clearButtonClicked:(id)sender {
+    [[RIGPlugin shared] clearDefaultRepo];
 }
 
 @end
