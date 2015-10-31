@@ -24,8 +24,6 @@
     self = [super initWithFrame:frame];
     if (self) {
         _cellViews = [NSMutableArray array];
-//        self.wantsLayer = YES;
-//        self.layer.backgroundColor = [NSColor redColor].CGColor;
     }
     return self;
 }

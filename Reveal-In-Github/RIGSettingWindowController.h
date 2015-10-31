@@ -7,7 +7,10 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "RIGGitRepo.h"
 
 @interface RIGSettingWindowController : NSWindowController
+
+@property (nonatomic, strong) RIGGitRepo *gitRepo;
 
 @end

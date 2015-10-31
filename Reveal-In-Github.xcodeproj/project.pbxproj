@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		7059A1891BE3AEBF00D9FBC5 /* RIGConfigCellsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7059A1881BE3AEBF00D9FBC5 /* RIGConfigCellsView.m */; };
 		705EEF5B1BD8100800A29083 /* RIGPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 705EEF591BD8100800A29083 /* RIGPlugin.m */; };
+		70805D3A1BE4E25300C2B498 /* RIGSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = 70805D391BE4E25300C2B498 /* RIGSetting.m */; };
+		70805D3D1BE4E5AD00C2B498 /* RIGGitRepo.m in Sources */ = {isa = PBXBuildFile; fileRef = 70805D3C1BE4E5AD00C2B498 /* RIGGitRepo.m */; };
+		70805D401BE4E7E100C2B498 /* RIGUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 70805D3F1BE4E7E100C2B498 /* RIGUtils.m */; };
 		70DDFEA71BE10642000406D2 /* RIGConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DDFEA61BE10642000406D2 /* RIGConfig.m */; };
 		70DE90B11BD932D300E29A15 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B01BD932D300E29A15 /* Cocoa.framework */; };
 		70DE90B31BD932D800E29A15 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70DE90B21BD932D800E29A15 /* Foundation.framework */; };
@@ -24,6 +27,12 @@
 		705EEF531BD80FB900A29083 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		705EEF591BD8100800A29083 /* RIGPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGPlugin.m; sourceTree = "<group>"; };
 		705EEF5A1BD8100800A29083 /* RIGPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGPlugin.h; sourceTree = "<group>"; };
+		70805D381BE4E25300C2B498 /* RIGSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGSetting.h; sourceTree = "<group>"; };
+		70805D391BE4E25300C2B498 /* RIGSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGSetting.m; sourceTree = "<group>"; };
+		70805D3B1BE4E5AD00C2B498 /* RIGGitRepo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGGitRepo.h; sourceTree = "<group>"; };
+		70805D3C1BE4E5AD00C2B498 /* RIGGitRepo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGGitRepo.m; sourceTree = "<group>"; };
+		70805D3E1BE4E7E100C2B498 /* RIGUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGUtils.h; sourceTree = "<group>"; };
+		70805D3F1BE4E7E100C2B498 /* RIGUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGUtils.m; sourceTree = "<group>"; };
 		70DDFEA51BE10642000406D2 /* RIGConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIGConfig.h; sourceTree = "<group>"; };
 		70DDFEA61BE10642000406D2 /* RIGConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIGConfig.m; sourceTree = "<group>"; };
 		70DE90B01BD932D300E29A15 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -80,6 +89,12 @@
 				70FD6DE41BDFE48500897138 /* RIGSettingWindowController.xib */,
 				705EEF5A1BD8100800A29083 /* RIGPlugin.h */,
 				705EEF591BD8100800A29083 /* RIGPlugin.m */,
+				70805D381BE4E25300C2B498 /* RIGSetting.h */,
+				70805D391BE4E25300C2B498 /* RIGSetting.m */,
+				70805D3B1BE4E5AD00C2B498 /* RIGGitRepo.h */,
+				70805D3C1BE4E5AD00C2B498 /* RIGGitRepo.m */,
+				70805D3E1BE4E7E100C2B498 /* RIGUtils.h */,
+				70805D3F1BE4E7E100C2B498 /* RIGUtils.m */,
 				705EEF531BD80FB900A29083 /* Info.plist */,
 			);
 			path = "Reveal-In-Github";
@@ -152,11 +167,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70805D401BE4E7E100C2B498 /* RIGUtils.m in Sources */,
 				705EEF5B1BD8100800A29083 /* RIGPlugin.m in Sources */,
 				70FD6DEC1BDFF86B00897138 /* RIGConfigCellView.m in Sources */,
 				70DDFEA71BE10642000406D2 /* RIGConfig.m in Sources */,
 				7059A1891BE3AEBF00D9FBC5 /* RIGConfigCellsView.m in Sources */,
 				70FD6DE51BDFE48500897138 /* RIGSettingWindowController.m in Sources */,
+				70805D3A1BE4E25300C2B498 /* RIGSetting.m in Sources */,
+				70805D3D1BE4E5AD00C2B498 /* RIGGitRepo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

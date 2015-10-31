@@ -12,10 +12,4 @@
 
 + (instancetype)shared;
 
-- (void)clearDefaultRepo;
-
-- (NSArray *)localConfigs;
-- (void)saveConfigs:(NSArray *)configs;
-- (void)clearConfigs;
-
 @end

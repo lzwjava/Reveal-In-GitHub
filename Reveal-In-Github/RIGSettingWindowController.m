@@ -10,6 +10,8 @@
 #import "RIGConfigCellsView.h"
 #import "RIGConfig.h"
 #import "RIGPlugin.h"
+#import "RIGUtils.h"
+#import "RIGSetting.h"
 
 #define kOutterXMargin 0
 #define kOutterYMargin 0
@@ -50,7 +52,7 @@
 }
 
 - (NSMutableArray *)displayConfigs {
-    NSMutableArray *configs = [NSMutableArray arrayWithArray:[[RIGPlugin shared] localConfigs]];
+    NSMutableArray *configs = [NSMutableArray arrayWithArray:[RIGSetting setting].configs];
     while (configs.count < 10) {
         RIGConfig *config = [[RIGConfig alloc] init];
         config.menuTitle = @"";
@@ -67,16 +69,37 @@
     [self.configCellsView reloadData];
 }
 
+- (BOOL)isValidConfigs:(NSArray *)configs {
+    for (RIGConfig *config in configs) {
+        if (![config isValid]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 - (IBAction)saveButtonClcked:(id)sender {
-    [[RIGPlugin shared] saveConfigs:self.configCellsView.configs];
+    NSArray *configs = self.configCellsView.configs;
+    if (![self isValidConfigs:configs]) {
+        [RIGUtils showMessage:@"Please complete the config, should have all three values."];
+        return;
+    }
+    [RIGSetting setting].configs = self.configCellsView.configs;
 }
 
 - (IBAction)clearButtonClicked:(id)sender {
-    [[RIGPlugin shared] clearDefaultRepo];
+    RIGSetting *setting = [RIGSetting settingForGitPath:self.gitRepo.localPath];
+    NSString *defaultRepo = setting.defaultRepo;
+    if (defaultRepo == nil) {
+        [RIGUtils showMessage:@"There's no default repo setting."];
+    } else {
+        setting.defaultRepo = nil;
+        [RIGUtils showMessage:[NSString stringWithFormat:@"Succeed to clear current default repo(%@) setting. In the next time to open github, will ask you to select new default repo.", defaultRepo]];
+    }
 }
 
 - (IBAction)resetMenusButtonClicked:(id)sender {
-    [[RIGPlugin shared] clearConfigs];
+    [[RIGSetting setting] setConfigs:[RIGSetting defaultConfigs]];
     [self reloadConfigs];
 }
 

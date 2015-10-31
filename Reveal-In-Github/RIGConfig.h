@@ -19,4 +19,6 @@
 
 + (instancetype)configWithMenuTitle:(NSString *)menuTitle lastKey:(NSString *)lastKey pattern:(NSString *)pattern;
 
+- (BOOL)isValid;
+
 @end
