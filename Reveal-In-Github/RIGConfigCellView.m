@@ -8,11 +8,11 @@
 
 #import "RIGConfigCellView.h"
 
-#define kHorizontalMargin 10
-#define kVerticalMargin 5
+#define kHorizontalMargin 8
+#define kVerticalMargin 2
 #define kTextFieldHeight 30
 #define kMenuTitleWidth 100
-#define kLastKeyWidth 100
+#define kLastKeyWidth 30
 
 @interface RIGConfigCellView()<NSTextFieldDelegate>
 
@@ -38,8 +38,10 @@
 }
 
 - (void)commonInitTextField:(NSTextField *)textField {
+    textField.cell.wraps = NO;
+    textField.cell.scrollable = YES;
     textField.delegate = self;
-    textField.font = [NSFont systemFontOfSize:16];
+//    textField.font = [NSFont systemFontOfSize:16];
 }
 
 - (NSTextField *)menuTitleField {

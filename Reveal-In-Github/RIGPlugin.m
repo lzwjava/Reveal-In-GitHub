@@ -103,43 +103,24 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSMenu *githubMenu = [self githubMenu];
     
-    NSMenuItem *repo = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Repo" action:@selector(openRepo:) keyEquivalent:@"R"];
-    [repo setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
-    repo.target = self;
-    [githubMenu addItem:repo];
-    
-    NSMenuItem *issue = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Issues" action:@selector(openIssues:) keyEquivalent:@"I"];
-    [issue setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    issue.target = self;
-    [githubMenu addItem:issue];
-    
-    NSMenuItem *PR = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"PRs" action:@selector(openPRs:) keyEquivalent:@"P"];
-    [PR setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    PR.target = self;
-    [githubMenu addItem:PR];
-    
-    NSMenuItem *file = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Quick File" action:@selector(openFile:) keyEquivalent:@"Q"];
-    [file setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
-    file.target = self;
-    [githubMenu addItem:file];
-    
-    NSMenuItem *history = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"List History" action:@selector(openHistory:) keyEquivalent:@"L"];
-    [history setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
-    history.target = self;
-    [githubMenu addItem:history];
-    
-    NSMenuItem *blame = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Blame" action:@selector(openBlame:) keyEquivalent:@"B"];
-    [blame setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask
-     ];
-    blame.target = self;
-    [githubMenu addItem:blame];
-    
     NSMenuItem *settings = [[NSMenuItem allocWithZone:[NSMenu menuZone]] initWithTitle:@"Settings" action:@selector(showSettingWindow:) keyEquivalent:@"S"];
     [settings setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
     settings.target = self;
     [githubMenu addItem:settings];
+    
+    NSArray *configs = [self localConfigs];
+    for (RIGConfig *config in configs) {
+        NSString *keyEquivalent = config.lastKey;
+        if (keyEquivalent == nil) {
+            keyEquivalent = @"";
+        }
+        NSMenuItem *configItem = [[NSMenuItem alloc] initWithTitle:config.menuTitle action:@selector(customMenusClicked:) keyEquivalent:keyEquivalent];
+        if (keyEquivalent.length > 0) {
+            [configItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSControlKeyMask];
+        }
+        configItem.target = self;
+        [githubMenu addItem:configItem];
+    }
 }
 
 #pragma mark - Notification and Selectors
@@ -261,18 +242,18 @@ static Class IDEWorkspaceWindowControllerClass;
     return [[NSUserDefaults standardUserDefaults] stringForKey:[self defaultRepoKey]];
 }
 
-- (NSString *)remoteRepoPath {
+- (NSString *)remoteRepoUrl {
     NSString *defaultRepo = [self defaultRepo];
     if (defaultRepo != nil) {
         return defaultRepo;
     } else {
-        NSString *selectedRepo = [self getOrAskRemoteRepoPath];
+        NSString *selectedRepo = [self getOrAskRemoteRepoUrl];
         [self setDefaultRepo:selectedRepo];
         return selectedRepo;
     }
 }
 
-- (NSString *)getOrAskRemoteRepoPath {
+- (NSString *)getOrAskRemoteRepoUrl {
     NSString *rootPath = [self gitRootPath];
     // Get Github username and repo name
     NSArray *args = @[@"remote", @"--verbose"];
@@ -321,12 +302,18 @@ static Class IDEWorkspaceWindowControllerClass;
         return nil;
     }
     
-    return selectedRemotePath;
+    NSString *fullUrl = [NSString stringWithFormat:@"https://%@", selectedRemotePath];
     
+    return fullUrl;
 }
 
 
 #pragma mark - Git Utils
+
+- (NSString *)filenameWithPathInCommit:(NSString *)commitHash {
+    NSURL *activeDocumentURL = [self activeDocument];
+    return [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
+}
 
 - (NSString *)filenameWithPathInCommit:(NSString *)commitHash forActiveDocumentURL:(NSURL *)activeDocumentURL {
     NSArray *args = @[@"show", @"--name-only", @"--pretty=format:", commitHash];
@@ -353,7 +340,7 @@ static Class IDEWorkspaceWindowControllerClass;
     return filenameWithPathInCommit;
 }
 
-- (NSString *)lastestCommitHash {
+- (NSString *)latestCommitHash {
     NSURL *activeDocumentURL = [self activeDocument];
     NSString *activeDocumentFullPath = [activeDocumentURL path];
     NSString *activeDocumentDirectoryPath = [[activeDocumentURL URLByDeletingLastPathComponent] path];
@@ -453,12 +440,15 @@ static Class IDEWorkspaceWindowControllerClass;
     }
 }
 
+- (void)openUrl:(NSString *)url {
+    [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
+}
+
 - (void)openRepo:(NSString *)repo withPath:(NSString *)path {
     NSString *secureBaseUrl = [NSString stringWithFormat:@"https://%@", repo];
     NSString *url = [NSString stringWithFormat:@"%@%@", secureBaseUrl, path];
     [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
 }
-
 
 #pragma mark - Clear Default Repo 
 
@@ -488,188 +478,6 @@ static Class IDEWorkspaceWindowControllerClass;
     return YES;
 }
 
-#pragma mark - Open Blame
-
-- (void)openBlame:(id)sender {
-    if (![self isValidGitRepo]) {
-        return;
-    }
-    
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        return;
-    }
-    
-    NSString *commitHash = [self lastestCommitHash];
-    if (!commitHash) {
-        return;
-    }
-    
-    NSURL *activeDocumentURL = [self activeDocument];
-    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
-    if (!filenameWithPathInCommit) {
-        return;
-    }
-    
-    [self findSelection];
-    
-    NSUInteger start = self.selectionStartLineNumber;
-    NSUInteger end = self.selectionEndLineNumber;
-    
-    NSMutableString *path = [NSMutableString stringWithFormat:@"/blame/%@/%@#L%ld",
-                             commitHash, filenameWithPathInCommit, start];
-    if (start != end) {
-        [path appendFormat:@"-L%ld", end];
-    }
-    [self openRepo:remoteRepoPath withPath:path];
-}
-
-#pragma mark - Open issues 
-
-- (NSTextCheckingResult *)checkingResultInString:(NSString *)string prefixes:(NSArray *)prefixes {
-    for (NSString *prefix in prefixes) {
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"%@#([0-9]*)", prefix] options:NSRegularExpressionCaseInsensitive error:nil];
-        NSTextCheckingResult *checking = [regex firstMatchInString:string options:0 range:NSMakeRange(0, string.length)];
-        if (checking) {
-            return checking;
-        }
-    }
-    return nil;
-}
-
-- (void)openIssues:(id)sender {
-    if (![self isValidGitRepo]) {
-        return;
-    }
-    
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        [self showMessage:@"Clould not find remote repo path"];
-        return;
-    }
-    NSString *selectedLineString = [self selectedLineString];
-    
-    NSTextCheckingResult *checking = [self checkingResultInString:selectedLineString prefixes:@[@"issue", @"Issue", @"issues", @""]];
-    if (checking == nil) {
-         [self openIssueAtIndex:0 remoteRepoPath:remoteRepoPath];
-    } else {
-        NSInteger index = [[selectedLineString substringWithRange:[checking rangeAtIndex:1]] integerValue];
-        [self openIssueAtIndex:index remoteRepoPath:remoteRepoPath];
-    }
-}
-
-- (void)openIssueAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
-    NSMutableString *path = [NSMutableString stringWithFormat:@"/issues"];
-    if (index > 0) {
-        [path appendFormat:@"/%ld", index];
-    }
-    [self openRepo:remoteRepoPath withPath:path];
-}
-
-#pragma mark - Open PRs
-
-- (void)openPRs:(id)sender {
-    if (![self isValidGitRepo]) {
-        return;
-    }
-    
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        [self showMessage:@"Clould not find remote repo path"];
-        return;
-    }
-    
-    NSString *selectedLineString = [self selectedLineString];
-    
-    NSTextCheckingResult *checking = [self checkingResultInString:selectedLineString prefixes:@[@"PR", @"Pull Requests", @"pulls", @"pull", @"pr", @""]];
-    if (checking == nil) {
-        [self openPRAtIndex:0 remoteRepoPath:remoteRepoPath];
-    } else {
-        NSInteger index = [[selectedLineString substringWithRange:[checking rangeAtIndex:1]] integerValue];
-        [self openPRAtIndex:index remoteRepoPath:remoteRepoPath];
-    }
-}
-
-- (void)openPRAtIndex:(NSInteger)index remoteRepoPath:(NSString *)remoteRepoPath{
-    NSString *path;
-    if (index > 0) {
-        path = [NSString stringWithFormat:@"/pull/%ld", index];
-    } else {
-        path = @"/pulls";
-    }
-    [self openRepo:remoteRepoPath withPath:path];
-}
-
-#pragma mark - Open History
-
-- (void)openHistory:(id)sender {
-    if (![self isValidGitRepo]) {
-        return;
-    }
-    
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        return;
-    }
-    
-    NSString *commitHash = [self lastestCommitHash];
-    if (!commitHash) {
-        return;
-    }
-    
-    NSURL *activeDocumentURL = [self activeDocument];
-    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
-    if (!filenameWithPathInCommit) {
-        return;
-    }
-    
-    NSString *path = [NSString stringWithFormat:@"/commits/%@/%@",
-                      commitHash, filenameWithPathInCommit];
-    [self openRepo:remoteRepoPath withPath:path];
-}
-
-#pragma mark - Open File
-
-- (void)openFile:(id)sender {
-    if (![self isValidGitRepo]) {
-        return;
-    }
-    
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        return;
-    }
-    
-    NSString *commitHash = [self lastestCommitHash];
-    if (!commitHash) {
-        return;
-    }
-    
-    NSURL *activeDocumentURL = [self activeDocument];
-    NSString *filenameWithPathInCommit = [self filenameWithPathInCommit:commitHash forActiveDocumentURL:activeDocumentURL];
-    if (!filenameWithPathInCommit) {
-        return;
-    }
-    
-    [self findSelection];
-    NSString *path = [NSString stringWithFormat:@"/blob/%@/%@#L%ld",
-                      commitHash, filenameWithPathInCommit, self.selectionStartLineNumber];
-    if (self.selectionStartLineNumber != self.selectionEndLineNumber) {
-        path = [path stringByAppendingFormat:@"-L%ld", self.selectionEndLineNumber];
-    }
-    [self openRepo:remoteRepoPath withPath:path];
-}
-
-#pragma mark - Open Repo
-
-- (void)openRepo:(id)sender {
-    NSString *remoteRepoPath = [self remoteRepoPath];
-    if (!remoteRepoPath) {
-        return;
-    }
-    [self openRepo:remoteRepoPath withPath:@""];
-}
-
 #pragma mark - Show Settings
 
 - (void)showSettingWindow:(id)sender {
@@ -678,39 +486,117 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (NSArray *)defaultConfigs {
-    RIGConfig *config1= [[RIGConfig alloc] init];
-    config1.menuTitle = @"Notification";
-    config1.lastKey = @"N";
-    config1.pattern = @"{{git_remote_url}}/notifications?all=1";
+    RIGConfig *config1 = [RIGConfig configWithMenuTitle:@"Repo" lastKey:@"R" pattern:@"{git_remote_url}"];
     
-    RIGConfig *config2= [[RIGConfig alloc] init];
-    config2.menuTitle = @"";
-    config2.lastKey = @"";
-    config2.pattern = @"";
+    RIGConfig *config2 = [RIGConfig configWithMenuTitle:@"Issues" lastKey:@"I" pattern:@"{git_remote_url}/issues"];
     
-    RIGConfig *config3 = [[RIGConfig alloc] init];
-    config3.menuTitle = @"";
-    config3.lastKey = @"";
-    config3.pattern = @"";
+    RIGConfig *config3 = [RIGConfig configWithMenuTitle:@"PRs" lastKey:@"P" pattern:@"{git_remote_url}/pulls"];
     
-    NSArray *configs = @[config3, config2, config1];
-    return configs;
+    RIGConfig *config4 = [RIGConfig configWithMenuTitle:@"Quick File" lastKey:@"Q" pattern:@"{git_remote_url}/blob/{commit}/{file_path}#{selection}"];
+    
+    RIGConfig *config5 = [RIGConfig configWithMenuTitle:@"List History" lastKey:@"L" pattern:@"{git_remote_url}/commits/{commit}/{file_path}"];
+    
+    RIGConfig *config6 = [RIGConfig configWithMenuTitle:@"Blame" lastKey:@"B" pattern:@"{git_remote_url}/blame/{commit}/{file_path}#{selection}"];
+    
+    RIGConfig *config7 = [RIGConfig configWithMenuTitle:@"Notifications" lastKey:@"N" pattern:@"{git_remote_url}/notifications?all=1"];
+    
+    return @[config7, config6, config5, config4, config3, config2, config1];
 }
 
 - (NSArray *)localConfigs {
-    NSArray *configs = [[NSUserDefaults standardUserDefaults] objectForKey:kRIGConfigs];
-    if (configs == nil) {
-        configs = [self defaultConfigs];
+    NSArray *configDicts = [[NSUserDefaults standardUserDefaults] objectForKey:kRIGConfigs];
+    if (configDicts == nil) {
+        [self saveConfigs:[self defaultConfigs]];
+        return [self localConfigs];
+    }
+    NSMutableArray *configs = [NSMutableArray array];
+    for (NSDictionary *configDict in configDicts) {
+        RIGConfig *config = [[RIGConfig alloc] initWithDictionary:configDict];
+        [configs addObject:config];
     }
     return configs;
+}
+
+- (BOOL)isValidConfig:(RIGConfig *)config {
+    return config.menuTitle.length != 0 && config.lastKey.length != 0 && config.pattern.length != 0;
+}
+
+- (void)clearConfigs {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kRIGConfigs];
 }
 
 - (void)saveConfigs:(NSArray *)configs {
     NSMutableArray *dicts = [NSMutableArray array];
     for (RIGConfig *config in configs) {
-        [dicts addObject:[config dictionary]];
+        NSDictionary *dict = [config dictionary];
+        if (dict.count > 0) {
+            BOOL isValid = [self isValidConfig:config];
+            if (!isValid) {
+                [self showMessage:@"Please complete the config, should have all three values."];
+                return;
+            }
+            [dicts addObject:dict];
+        }
     }
     [[NSUserDefaults standardUserDefaults] setObject:dicts forKey:kRIGConfigs];
+}
+
+#pragma mark - Custom
+
+- (NSDictionary *)currentRepoInfos {
+    NSMutableDictionary *dict= [[NSMutableDictionary alloc] init];
+    NSString *gitRemoteUrl = [self remoteRepoUrl];
+    if (gitRemoteUrl) {
+        [dict setObject:gitRemoteUrl forKey:@"{git_remote_url}"];
+    }
+    NSString *commit = [self latestCommitHash];
+    if (commit) {
+        [dict setObject:commit forKey:@"{commit}"];
+        NSString *filePath = [self filenameWithPathInCommit:commit];
+        if (filePath) {
+            [dict setObject:filePath forKey:@"{file_path}"];
+        }
+    }
+    NSString *selection = [self selectionString];
+    if (selection) {
+        [dict setObject:selection forKey:@"{selection}"];
+    }
+    return dict;
+}
+
+- (NSString *)selectionString {
+    [self findSelection];
+    
+    NSUInteger start = self.selectionStartLineNumber;
+    NSUInteger end = self.selectionEndLineNumber;
+    
+    if (start == end) {
+        return [NSString stringWithFormat:@"L%ld", start];
+    } else {
+        return [NSString stringWithFormat:@"L%ld-L%ld", start, end];
+    }
+}
+
+- (void)customMenusClicked:(NSMenuItem *)menuItem {
+    if (![self isValidGitRepo]) {
+        return;
+    }
+    
+    RIGConfig *currentConfig = nil;
+    for (RIGConfig *confing in [self localConfigs]) {
+        if ([confing.menuTitle isEqualToString:menuItem.title]) {
+            currentConfig = confing;
+            break;
+        }
+    }
+    
+    NSDictionary *infos = [self currentRepoInfos];
+    NSMutableString *url = [[NSMutableString alloc] initWithString:currentConfig.pattern];
+    for (NSString *key in [infos allKeys]) {
+        NSString *value = [infos objectForKey:key];
+        [url replaceOccurrencesOfString:key withString:value options:NSLiteralSearch range:NSMakeRange(0, url.length)];
+    }
+    [self openUrl:url];
 }
 
 @end

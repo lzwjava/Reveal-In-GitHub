@@ -17,4 +17,6 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
 - (NSDictionary *)dictionary;
 
++ (instancetype)configWithMenuTitle:(NSString *)menuTitle lastKey:(NSString *)lastKey pattern:(NSString *)pattern;
+
 @end

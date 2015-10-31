@@ -24,16 +24,24 @@
 
 - (NSDictionary *)dictionary {
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    if (self.menuTitle) {
+    if (self.menuTitle.length > 0) {
         [dict setObject:self.menuTitle forKey:SEL_TO_STRING(menuTitle)];
     }
-    if (self.lastKey) {
+    if (self.lastKey.length > 0) {
         [dict setObject:self.lastKey forKey:SEL_TO_STRING(lastKey)];
     }
-    if (self.pattern) {
+    if (self.pattern.length > 0) {
         [dict setObject:self.pattern forKey:SEL_TO_STRING(pattern)];
     }
     return dict;
+}
+
++ (instancetype)configWithMenuTitle:(NSString *)menuTitle lastKey:(NSString *)lastKey pattern:(NSString *)pattern {
+    RIGConfig *config = [[self alloc] init];
+    config.menuTitle = menuTitle;
+    config.lastKey = lastKey;
+    config.pattern = pattern;
+    return config;
 }
 
 - (NSString *)description {
