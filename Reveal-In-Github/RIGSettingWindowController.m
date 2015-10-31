@@ -39,7 +39,14 @@
     self.configCellsView = [[RIGConfigCellsView alloc] initWithFrame:CGRectMake(kOutterXMargin, kOutterYMargin, CGRectGetWidth(self.configsView.frame) - 2 * kOutterXMargin, [RIGConfigCellsView heightForConfigs:self.configs])];
     self.configCellsView.configs = self.configs;
     [self.configsView addSubview:self.configCellsView];
+//    [self updateConfigsViewHeight];
     [self.configCellsView reloadData];
+}
+
+- (void)updateConfigsViewHeight {
+    CGRect frame = self.configsView.frame;
+    frame.size.height = CGRectGetHeight(self.configCellsView.frame);
+    self.configsView.frame = frame;
 }
 
 - (NSMutableArray *)displayConfigs {

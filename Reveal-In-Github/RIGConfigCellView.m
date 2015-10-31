@@ -10,7 +10,7 @@
 
 #define kHorizontalMargin 8
 #define kVerticalMargin 2
-#define kTextFieldHeight 30
+#define kTextFieldHeight 25
 #define kMenuTitleWidth 100
 #define kLastKeyWidth 30
 
