@@ -61,9 +61,9 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rMv-by-SKS">
-                        <rect key="frame" x="112" y="392" width="162" height="18"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Ctrl+Command+Shift+" id="2LV-Dl-1cY">
-                            <font key="font" metaFont="system" size="15"/>
+                        <rect key="frame" x="112" y="391" width="63" height="19"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="⌃⇧⌘ +" id="2LV-Dl-1cY">
+                            <font key="font" size="15" name=".LucidaGrandeUI"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
