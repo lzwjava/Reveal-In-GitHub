@@ -21,6 +21,8 @@ It has six menu items:
  Blame          |⌃⇧⌘B | https://github.com/lzwjava/LZAlbum/blame/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
  Notifications  |⌃⇧⌘N | https://github.com/leancloud/LZAlbum/notifications?all=1
 
+The shortcuts are carefully designed. They will not confict to Xcode default shortcuts.
+
 Blame (find who latestly modify current line):
 
 ![qq20151101-1 2x](https://cloud.githubusercontent.com/assets/5022872/10864851/a9124530-8035-11e5-8d67-ea73c9156d71.png)
