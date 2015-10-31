@@ -10,7 +10,7 @@ My company work on Github. I open the Github a lot. Sometimes, I am editing on X
 
 It has six menu items:
 
- Name           | Shortcut              | Github URL Pattern (When I'm editing LZAlbumManager.m Line 40)               
+ Menu Title     | Shortcut              | Github URL Pattern (When I'm editing LZAlbumManager.m Line 40)               
 ----------------|-----------------------|----------------------------------
  Setting	    |⌃⇧⌘S |
  Repo           |⌃⇧⌘R | https://github.com/lzwjava/LZAlbum
@@ -21,7 +21,7 @@ It has six menu items:
  Blame          |⌃⇧⌘B | https://github.com/lzwjava/LZAlbum/blame/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
  Notifications  |⌃⇧⌘N | https://github.com/leancloud/LZAlbum/notifications?all=1
 
-The shortcuts are carefully designed. They will not confict to Xcode default shortcuts.
+The shortcuts are carefully designed. They will not confict to Xcode default shortcuts. The shortcut pattern is ⌃⇧⌘ + First Character of the menu title.
 
 Blame (find who latestly modify current line):
 
