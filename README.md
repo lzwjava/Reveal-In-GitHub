@@ -67,7 +67,7 @@ Then the plugin remembers which you choose. So when you trigger the menu again, 
 ## Install
 
 1. Clone this repo.
-2. Open `Reveal-In-Github.xcodeprojc`, and build it.
+2. Open `Reveal-In-Github.xcodeproj`, and build it.
 3. Reveal-In-Github.xcplugin should locate at `~/Library/Application Support/Developer/Shared/Xcode/Plug-ins`
 4. Restart Xcode
 5. Open any Github Project and press ⌃⇧⌘B (Ctrl+Shift+Command+B) to blame the code.
