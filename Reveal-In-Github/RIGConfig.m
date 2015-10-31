@@ -46,13 +46,14 @@
 
 
 - (BOOL)isValid {
-    return self.menuTitle.length != 0 && self.lastKey.length != 0 && self.pattern.length != 0;
+    if (self.menuTitle.length > 0 || self.pattern.length != 0) {
+        return self.menuTitle.length > 0 && self.pattern.length > 0;
+    }
+    return YES;
 }
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"RIGConfig <menuTitle:%@, lastKey:%@, pattern:%@", self.menuTitle, self.lastKey, self.pattern];
 }
-
-
 
 @end

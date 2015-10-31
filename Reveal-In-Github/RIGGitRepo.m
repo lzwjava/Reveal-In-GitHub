@@ -8,7 +8,6 @@
 
 #import "RIGGitRepo.h"
 #import "RIGUtils.h"
-#import <Cocoa/Cocoa.h>
 #import "RIGSetting.h"
 
 @interface RIGGitRepo()

@@ -167,8 +167,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				70805D401BE4E7E100C2B498 /* RIGUtils.m in Sources */,
 				705EEF5B1BD8100800A29083 /* RIGPlugin.m in Sources */,
+				70805D401BE4E7E100C2B498 /* RIGUtils.m in Sources */,
 				70FD6DEC1BDFF86B00897138 /* RIGConfigCellView.m in Sources */,
 				70DDFEA71BE10642000406D2 /* RIGConfig.m in Sources */,
 				7059A1891BE3AEBF00D9FBC5 /* RIGConfigCellsView.m in Sources */,
