@@ -154,12 +154,13 @@
 #pragma mark - Remote Repo
 
 - (NSString *)remoteRepoUrl {
-    NSString *defaultRepo = [[RIGSetting setting] defaultRepo];
+    RIGSetting *setting = [RIGSetting settingForGitPath:self.localPath];
+    NSString *defaultRepo = [setting defaultRepo];
     if (defaultRepo != nil) {
         return defaultRepo;
     } else {
         NSString *selectedRepo = [self getOrAskRemoteRepoUrl];
-        [[RIGSetting setting] setDefaultRepo:selectedRepo];
+        [setting setDefaultRepo:selectedRepo];
         return selectedRepo;
     }
 }

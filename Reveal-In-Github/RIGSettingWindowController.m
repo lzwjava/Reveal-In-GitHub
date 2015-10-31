@@ -96,7 +96,7 @@
         return;
     }
     [RIGSetting setting].configs = self.configCellsView.configs;
-    [RIGUtils showMessage:@"Save succeed"];
+    [RIGUtils showMessage:@"Save succeed. Will Take effect when reopen Xcode."];
 }
 
 - (IBAction)clearButtonClicked:(id)sender {

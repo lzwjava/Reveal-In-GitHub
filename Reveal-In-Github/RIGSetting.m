@@ -51,6 +51,7 @@
 - (void)setConfigs:(NSArray *)configs {
     NSArray *dicts = [[self class] dictsForConfigs:configs];
     [[NSUserDefaults standardUserDefaults] setObject:dicts forKey:kRIGConfigs];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 + (NSArray *)dictsForConfigs:(NSArray *)configs {
@@ -95,6 +96,7 @@
     } else {
         [ud setObject:defaultRepo forKey:[self defaultRepoKey]];
     }
+    [ud synchronize];
 }
 
 - (NSString *)defaultRepo {
