@@ -21,4 +21,6 @@
 
 - (BOOL)isValid;
 
+- (void)removeNil;
+
 @end

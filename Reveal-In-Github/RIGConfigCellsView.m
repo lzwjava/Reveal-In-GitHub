@@ -46,7 +46,7 @@
     for (RIGConfig *config in self.configs) {
         NSInteger index = [self.configs indexOfObject:config];
         CGFloat subH = [RIGConfigCellView heightForCellView];
-        CGFloat y = index * (subH + kVerticalMargin);
+        CGFloat y = (self.configs.count - 1 - index) * (subH + kVerticalMargin);
         RIGConfigCellView *cellView = [[RIGConfigCellView alloc] initWithFrame:NSRectFromCGRect(CGRectMake(0, y, w, subH))];
         cellView.config = config;
         [cellView reloadData];

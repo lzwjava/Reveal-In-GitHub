@@ -44,16 +44,24 @@
     return config;
 }
 
-
 - (BOOL)isValid {
-    if (self.menuTitle.length > 0 || self.pattern.length != 0) {
-        return self.menuTitle.length > 0 && self.pattern.length > 0;
-    }
-    return YES;
+    return self.menuTitle.length > 0 && self.pattern.length > 0;
 }
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"RIGConfig <menuTitle:%@, lastKey:%@, pattern:%@", self.menuTitle, self.lastKey, self.pattern];
+}
+
+- (void)removeNil {
+    if (self.menuTitle == nil) {
+        self.menuTitle = @"";
+    }
+    if (self.lastKey == nil) {
+        self.lastKey = @"";
+    }
+    if (self.pattern == nil) {
+        self.pattern = @"";
+    }
 }
 
 @end

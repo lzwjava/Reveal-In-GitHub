@@ -58,9 +58,7 @@
     for (RIGConfig *config in configs) {
         NSDictionary *dict = [config dictionary];
         if (dict.count > 0) {
-            if ([config isValid]) {
-                [dicts addObject:dict];
-            }
+            [dicts addObject:dict];
         }
     }
     return dicts;
@@ -81,7 +79,7 @@
     
     RIGConfig *config7 = [RIGConfig configWithMenuTitle:@"Notifications" lastKey:@"N" pattern:@"{git_remote_url}/notifications?all=1"];
     
-    return @[config7, config6, config5, config4, config3, config2, config1];
+    return @[config1, config2, config3, config4, config5, config6, config7];
 }
 
 #pragma mark -

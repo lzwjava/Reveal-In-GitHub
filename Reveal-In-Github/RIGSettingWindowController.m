@@ -58,7 +58,7 @@
         config.menuTitle = @"";
         config.lastKey = @"";
         config.pattern = @"";
-        [configs insertObject:config atIndex:0];
+        [configs addObject:config];
     }
     return configs;
 }
@@ -78,13 +78,25 @@
     return YES;
 }
 
-- (IBAction)saveButtonClcked:(id)sender {
+- (NSArray *)filteredConfigs {
+    NSMutableArray *filtered = [NSMutableArray array];
     NSArray *configs = self.configCellsView.configs;
+    for (RIGConfig *config in configs) {
+        if (config.menuTitle.length > 0 || config.lastKey.length > 0 || config.pattern.length > 0) {
+            [filtered addObject:config];
+        }
+    }
+    return filtered;
+}
+
+- (IBAction)saveButtonClcked:(id)sender {
+    NSArray *configs = [self filteredConfigs];
     if (![self isValidConfigs:configs]) {
-        [RIGUtils showMessage:@"Please complete the config, should have all three values."];
+        [RIGUtils showMessage:@"Please complete the config, should at least have menuTitle and pattern."];
         return;
     }
     [RIGSetting setting].configs = self.configCellsView.configs;
+    [RIGUtils showMessage:@"Save succeed"];
 }
 
 - (IBAction)clearButtonClicked:(id)sender {

@@ -70,6 +70,7 @@
 }
 
 - (void)reloadData {
+    [self.config removeNil];
     self.menuTitleField.stringValue = self.config.menuTitle;
     self.lastKeyField.stringValue = self.config.lastKey;
     self.patternField.stringValue = self.config.pattern;
