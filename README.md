@@ -2,11 +2,13 @@
 
 Xcode plugin to let you jump to Github History, Blame, PRs, Issues, Notifications of current repo in one second.
 
-<img width="700" alt="2015-11-01 12 56 35" src="https://cloud.githubusercontent.com/assets/5022872/10864813/5df3f05e-8034-11e5-9f3e-03ae3fbc3cfc.png">
+![plugin](https://cloud.githubusercontent.com/assets/5022872/10867703/96e980be-80ab-11e5-9aaa-a06ef476b7f7.gif)
 
 My company work on Github. I open the Github a lot. Sometimes, I am editing on Xcode and do not understand some code, so I go to github to blame them. Sometimes, find the latest commits about a file to help me figure out how the code evolves. So I wonder is there a tool to help me quick open Github from Xcode. So I write this plugin. When you editing some source file on Xcode, it's easy to know which Github repo you are working on and know which file you are editing. So it makes sense to quickly jump to the file on Github, quickly jump to blame the current editing line on Github, quickly jump to the issues or prs of the current repo you are working on Xcode.
 
 ## Menu items
+
+<img width="700" alt="2015-11-01 12 56 35" src="https://cloud.githubusercontent.com/assets/5022872/10864813/5df3f05e-8034-11e5-9f3e-03ae3fbc3cfc.png">
 
 It has six menu items:
 
