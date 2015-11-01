@@ -66,7 +66,7 @@ Or
 
 ## 安装
 
-推荐使用 [Alcatraz](http://alcatraz.io/)，可参考巧神的一遍[博客](http://blog.devtang.com/blog/2014/03/05/use-alcatraz-to-manage-xcode-plugins/)。按装好后，按照上图搜索 `Reveal In Github`，点击 `Install` 即可。
+推荐使用 [Alcatraz](http://alcatraz.io/)，可参考巧神的一遍[博客](http://blog.devtang.com/blog/2014/03/05/use-alcatraz-to-manage-xcode-plugins/)。安装好后，按照上图搜索 `Reveal In Github`，点击 `Install` 即可。
 
 如果不使用这个工具的话，那么也只需三步：
 
