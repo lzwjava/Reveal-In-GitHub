@@ -64,6 +64,16 @@ Or
 4. Restart Xcode
 5. Open any Github Project and press ⌃⇧⌘B (Ctrl+Shift+Command+B) to blame the code.
 
+## 安装 (Chinese)
+
+推荐使用 [Alcatraz]，可参考巧神的一遍[博客](http://blog.devtang.com/blog/2014/03/05/use-alcatraz-to-manage-xcode-plugins/)。按装好后，按照上图搜索 Reveal In Github 即可，点击 `Install` 即可。
+
+如果不使用这个工具的话，那么也只需三步：
+
+* 克隆该项目到本地。
+* 打开 xcodeproj，点击 Build 构建。这会在目录`~/Library/Application Support/Developer/Shared/Xcode/Plug-ins` 生成 Reveal-In-Github.xcplugin 文件。
+* 重启 Xcode，打开任意一个放在 Github 上的项目。按下 `Ctrl+Shift+Command+B` 即可。
+
 ## Credit
 
 When at the course of developing it, find another plugin [ShowInGithub](https://github.com/larsxschneider/ShowInGitHub) do something similar. I learn some techique from it. Thanks for that.
