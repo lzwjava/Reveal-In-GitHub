@@ -17,6 +17,6 @@
 
 @interface RIGUtils : NSObject
 
-+ (void)showMessage:(NSString *)message;
++ (NSModalResponse)showMessage:(NSString *)message;
 
 @end

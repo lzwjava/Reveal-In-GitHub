@@ -63,7 +63,7 @@
     
     if (commitHashInfo.count < 2)
     {
-//        [self showMessage:@"Unable to find lastest commit."];
+//        [RIGUtils showMessage:@"Unable to find lastest commit."];
         return nil;
     }
     

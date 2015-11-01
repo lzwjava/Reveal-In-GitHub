@@ -189,7 +189,17 @@ static Class IDEWorkspaceWindowControllerClass;
 }
 
 - (void)openUrl:(NSString *)url {
-    [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
+    NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[url]];
+    [task waitUntilExit];
+    if (![task isRunning]) {
+        int status = [task terminationStatus];
+        if (status != 0 ) {
+            NSModalResponse res = [RIGUtils showMessage:[NSString stringWithFormat:@"Cloud not open %@. It might be a bug. Please report it. Thanks.", url]];
+            if (res == NSAlertFirstButtonReturn) {
+                [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:@[@"https://github.com/lzwjava/Reveal-In-Github/issues/new"]];
+            }
+        }
+    }
 }
 
 #pragma mark - Show Settings
@@ -242,12 +252,12 @@ static Class IDEWorkspaceWindowControllerClass;
 - (BOOL)trySetGitRepo {
     NSURL *activeDocumentURL = [self activeDocument];
     if (activeDocumentURL == nil) {
-        [self showMessage:@"No file is opening now."];
+        [RIGUtils showMessage:@"No file is opening now."];
         return NO;
     }
     self.gitRepo = [[RIGGitRepo alloc] initWithDocumentURL:[self activeDocument]];
     if (![self.gitRepo isValid]) {
-        [self showMessage:@"Could not get git repo from current file."];
+        [RIGUtils showMessage:@"Could not get git repo from current file."];
         return NO;
     }
     return YES;
@@ -268,7 +278,7 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSDictionary *infos = [self currentRepoInfos];
     if (infos[kPatternGitRemoteUrl] == nil) {
-        [self showMessage:@"Cannot find a git remote."];
+        [RIGUtils showMessage:@"Cannot find a git remote."];
         return;
     }
     NSMutableString *url = [[NSMutableString alloc] initWithString:currentConfig.pattern];
@@ -277,10 +287,6 @@ static Class IDEWorkspaceWindowControllerClass;
         [url replaceOccurrencesOfString:key withString:value options:NSLiteralSearch range:NSMakeRange(0, url.length)];
     }
     [self openUrl:url];
-}
-
-- (void)showMessage:(NSString *)message {
-    [RIGUtils showMessage:message];
 }
 
 @end

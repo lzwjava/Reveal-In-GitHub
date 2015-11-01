@@ -11,12 +11,12 @@
 
 @implementation RIGUtils
 
-+ (void)showMessage:(NSString *)message {
++ (NSModalResponse)showMessage:(NSString *)message {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:@"OK"];
     [alert setMessageText: message];
     [alert setAlertStyle:NSWarningAlertStyle];
-    [alert runModal];
+    return [alert runModal];
 }
 
 @end
