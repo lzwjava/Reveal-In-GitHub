@@ -25,20 +25,6 @@ It has six menu items:
 
 The shortcuts are carefully designed. They will not confict to Xcode default shortcuts. The shortcut pattern is ⌃⇧⌘ + First Character of the menu title.
 
-Blame (find who latestly modify current line):
-
-![qq20151101-1 2x](https://cloud.githubusercontent.com/assets/5022872/10864851/a9124530-8035-11e5-8d67-ea73c9156d71.png)
-
-When I don't understand some magic code, I use this to help me figure it out.
-
-Current Repo's Pull Requests:
-
-![qq20151101-5 2x](https://cloud.githubusercontent.com/assets/5022872/10864881/96279d84-8036-11e5-9799-61a27dd3a525.png)
-
-Current Repo's Notifications(You need to watch the repo):
-
-![qq20151101-6 2x](https://cloud.githubusercontent.com/assets/5022872/10864886/aa27ecd0-8036-11e5-929c-ea1adc106103.png)
-
 ## Customize
 
 Sometimes, you may want to quickly jump to Wiki. Here is the way, open the setting:
