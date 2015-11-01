@@ -17,6 +17,8 @@ id objc_getClass(const char* name);
 
 #define kRIGMenuToInsert @"Window"
 
+#define kPatternGitRemoteUrl @"{git_remote_url}"
+
 static Class DVTSourceTextViewClass;
 static Class IDEWorkspaceWindowControllerClass;
 
@@ -207,7 +209,7 @@ static Class IDEWorkspaceWindowControllerClass;
     NSMutableDictionary *dict= [[NSMutableDictionary alloc] init];
     NSString *gitRemoteUrl = [self.gitRepo remoteRepoUrl];
     if (gitRemoteUrl) {
-        [dict setObject:gitRemoteUrl forKey:@"{git_remote_url}"];
+        [dict setObject:gitRemoteUrl forKey:kPatternGitRemoteUrl];
     }
     NSString *commit = [self.gitRepo latestCommitHash];
     if (commit) {
@@ -265,6 +267,10 @@ static Class IDEWorkspaceWindowControllerClass;
     }
     
     NSDictionary *infos = [self currentRepoInfos];
+    if (infos[kPatternGitRemoteUrl] == nil) {
+        [self showMessage:@"Cannot find a git remote."];
+        return;
+    }
     NSMutableString *url = [[NSMutableString alloc] initWithString:currentConfig.pattern];
     for (NSString *key in [infos allKeys]) {
         NSString *value = [infos objectForKey:key];
