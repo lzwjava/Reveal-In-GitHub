@@ -66,6 +66,12 @@ Then the plugin remembers which you choose. So when you trigger the menu again, 
 
 ## Install
 
+Recomend install with Alcatraz,
+
+![qq20151101-1 2x](https://cloud.githubusercontent.com/assets/5022872/10867743/0ce351c6-80ae-11e5-82e2-f740887153f7.jpg)
+
+Or
+
 1. Clone this repo.
 2. Open `Reveal-In-Github.xcodeproj`, and build it.
 3. Reveal-In-Github.xcplugin should locate at `~/Library/Application Support/Developer/Shared/Xcode/Plug-ins`
