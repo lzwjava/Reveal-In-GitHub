@@ -172,7 +172,7 @@ static Class IDEWorkspaceWindowControllerClass;
     
     NSString *sourceTextSelection = [[self.sourceTextView string] substringWithRange:selectedRange];
     NSUInteger selectedLines = [[sourceTextSelection componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] count];
-    self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 2 : 0);
+    self.selectionEndLineNumber = self.selectionStartLineNumber + (selectedLines > 1 ? selectedLines - 1 : 0);
 }
 
 - (NSString *)selectedLineString {
