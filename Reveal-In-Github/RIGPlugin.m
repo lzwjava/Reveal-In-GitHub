@@ -18,8 +18,6 @@ id objc_getClass(const char* name);
 #define kRIGMenuToInsert @"Window"
 
 static Class DVTSourceTextViewClass;
-static Class IDESourceCodeEditorClass;
-static Class IDEApplicationClass;
 static Class IDEWorkspaceWindowControllerClass;
 
 @interface RIGPlugin()
@@ -40,8 +38,6 @@ static Class IDEWorkspaceWindowControllerClass;
 
 + (void)pluginDidLoad:(NSBundle *)plugin {
     DVTSourceTextViewClass = objc_getClass("DVTSourceTextView");
-    IDESourceCodeEditorClass = objc_getClass("IDESourceCodeEditor");
-    IDEApplicationClass = objc_getClass("IDEApplication");
     IDEWorkspaceWindowControllerClass = objc_getClass("IDEWorkspaceWindowController");
     [self shared];
 }
@@ -125,30 +121,10 @@ static Class IDEWorkspaceWindowControllerClass;
 - (void)addNotification {
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:nil];
-    [nc addObserver:self selector:@selector(didChangeMenuItem:) name:NSMenuDidChangeItemNotification object:nil];
-    [nc addObserver:self selector:@selector(applicationUnderMouseProjectName:) name:@"DVTSourceExpressionUnderMouseDidChangeNotification" object:nil];
-    
-    [nc addObserver:self selector:@selector(didChangeStateOfIDEIndex:) name:@"IDEIndexDidChangeStateNotification" object:nil];
     
     [nc addObserver:self selector:@selector(sourceTextViewSelectionDidChange:) name:NSTextViewDidChangeSelectionNotification object:nil];
     
     [nc addObserver:self selector:@selector(fetchActiveIDEWorkspaceWindow:) name:NSWindowDidUpdateNotification object:nil];
-}
-
-- (void)didChangeMenuItem:(NSNotification *)noti {
-//    if ([[noti.object title] isEqualToString:kRIGMenuToInsert]) {
-//        @synchronized(self) {
-//            [self addMenu];
-//        }
-//    }
-}
-
-- (void)applicationUnderMouseProjectName:(NSNotification *)noti {
-    
-}
-
-- (void)didChangeStateOfIDEIndex:(NSNotification *)noti {
-    
 }
 
 - (void)sourceTextViewSelectionDidChange:(NSNotification *)notification {
