@@ -66,7 +66,7 @@ Then the plugin remembers which you choose. So when you trigger the menu again, 
 
 ## Install
 
-Recomend install with Alcatraz,
+Recomend install with [Alcatraz](http://alcatraz.io/),
 
 ![qq20151101-1 2x](https://cloud.githubusercontent.com/assets/5022872/10867743/0ce351c6-80ae-11e5-82e2-f740887153f7.jpg)
 
