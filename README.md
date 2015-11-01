@@ -23,7 +23,7 @@ It has six menu items:
  Blame          |⌃⇧⌘B | https://github.com/lzwjava/LZAlbum/blame/fd7224/LZAlbum/manager/LZAlbumManager.m#L40
  Notifications  |⌃⇧⌘N | https://github.com/leancloud/LZAlbum/notifications?all=1
 
-The shortcuts are carefully designed. They will not confict to Xcode default shortcuts. The shortcut pattern is ⌃⇧⌘ + First Character of the menu title.
+The shortcuts are carefully designed. They will not confict to Xcode default shortcuts. The shortcut pattern is ⌃⇧⌘ (Ctrl+Shift+Command), plus First Character of the menu title. 
 
 ## Customize
 
