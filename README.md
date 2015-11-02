@@ -1,10 +1,10 @@
-# Reaveal-In-Github
+# Reaveal-In-GitHub
 
-Xcode plugin to let you jump to Github History, Blame, PRs, Issues, Notifications of current repo in one second.
+Xcode plugin to let you jump to GitHub History, Blame, PRs, Issues, Notifications of current repo in one second.
 
 ![plugin](https://cloud.githubusercontent.com/assets/5022872/10867703/96e980be-80ab-11e5-9aaa-a06ef476b7f7.gif)
 
-My company work on Github. I open the Github a lot. Sometimes, I am editing on Xcode and do not understand some code, so I go to github to blame them. Sometimes, find the latest commits about a file to help me figure out how the code evolves. So I wonder is there a tool to help me quick open Github from Xcode. So I write this plugin. When you editing some source file on Xcode, it's easy to know which Github repo you are working on and know which file you are editing. So it makes sense to quickly jump to the file on Github, quickly jump to blame the current editing line on Github, quickly jump to the issues or prs of the current repo you are working on Xcode.
+My company work on GitHub. I open the GitHub a lot. Sometimes, I am editing on Xcode and do not understand some code, so I go to GitHub to blame them. Sometimes, find the latest commits about a file to help me figure out how the code evolves. So I wonder is there a tool to help me quick open GitHub from Xcode. So I write this plugin. When you editing some source file on Xcode, it's easy to know which GitHub repo you are working on and know which file you are editing. So it makes sense to quickly jump to the file on GitHub, quickly jump to blame the current editing line on GitHub, quickly jump to the issues or prs of the current repo you are working on Xcode.
 
 ## Menu Items
 
@@ -12,7 +12,7 @@ My company work on Github. I open the Github a lot. Sometimes, I am editing on X
 
 It has six menu items:
 
- Menu Title     | Shortcut              | Github URL Pattern (When I'm editing LZAlbumManager.m Line 40)               
+ Menu Title     | Shortcut              | GitHub URL Pattern (When I'm editing LZAlbumManager.m Line 40)               
 ----------------|-----------------------|----------------------------------
  Setting	    |⌃⇧⌘S |
  Repo           |⌃⇧⌘R | https://github.com/lzwjava/LZAlbum
@@ -59,24 +59,24 @@ Recomend install with [Alcatraz](http://alcatraz.io/),
 Or
 
 1. Clone this repo.
-2. Open `Reveal-In-Github.xcodeproj`, and build it.
-3. Reveal-In-Github.xcplugin should locate at `~/Library/Application Support/Developer/Shared/Xcode/Plug-ins`
+2. Open `Reveal-In-GitHub.xcodeproj`, and build it.
+3. Reveal-In-GitHub.xcplugin should locate at `~/Library/Application Support/Developer/Shared/Xcode/Plug-ins`
 4. Restart Xcode
-5. Open any Github Project and press ⌃⇧⌘B (Ctrl+Shift+Command+B) to blame the code.
+5. Open any GitHub Project and press ⌃⇧⌘B (Ctrl+Shift+Command+B) to blame the code.
 
 ## 安装
 
-推荐使用 [Alcatraz](http://alcatraz.io/)，可参考巧神的一遍[博客](http://blog.devtang.com/blog/2014/03/05/use-alcatraz-to-manage-xcode-plugins/)。安装好后，按照上图搜索 `Reveal In Github`，点击 `Install` 即可。
+推荐使用 [Alcatraz](http://alcatraz.io/)，可参考巧神的一遍[博客](http://blog.devtang.com/blog/2014/03/05/use-alcatraz-to-manage-xcode-plugins/)。安装好后，按照上图搜索 `Reveal In GitHub`，点击 `Install` 即可。
 
 如果不使用这个工具的话，那么也只需三步：
 
 * 克隆该项目到本地。
-* 打开 xcodeproj，点击 Build 构建。这会在目录`~/Library/Application Support/Developer/Shared/Xcode/Plug-ins` 生成 Reveal-In-Github.xcplugin 文件。
-* 重启 Xcode，打开任意一个放在 Github 上的项目。按下 `Ctrl+Shift+Command+B` 即可。
+* 打开 xcodeproj，点击 Build 构建。这会在目录`~/Library/Application Support/Developer/Shared/Xcode/Plug-ins` 生成 Reveal-In-GitHub.xcplugin 文件。
+* 重启 Xcode，打开任意一个放在 GitHub 上的项目。按下 `Ctrl+Shift+Command+B` 即可。
 
 ## Credit
 
-When at the course of developing it, find another plugin [ShowInGithub](https://github.com/larsxschneider/ShowInGitHub) do something similar. I learn some techique from it. Thanks for that.
+When at the course of developing it, find another plugin [ShowInGitHub](https://github.com/larsxschneider/ShowInGitHub) do something similar. I learn some techique from it. Thanks for that.
 
 ## License
 
