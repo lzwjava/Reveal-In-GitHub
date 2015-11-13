@@ -1,4 +1,4 @@
-# Reaveal-In-GitHub
+# Reveal-In-GitHub
 
 Xcode plugin to let you jump to GitHub History, Blame, PRs, Issues, Notifications of current repo in one second.
 
