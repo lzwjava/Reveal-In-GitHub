@@ -1,6 +1,6 @@
 # Reveal-In-GitHub
 
-Xcode plugin to let you jump to GitHub History, Blame, PRs, Issues, Notifications of current repo in one second.
+An Xcode plugin designed for seamless navigation to key GitHub functionalities within your current repository. With just a click, effortlessly access GitHub History, Blame, Pull Requests, Issues, and Notifications, all in a matter of seconds.
 
 ![plugin](https://cloud.githubusercontent.com/assets/5022872/10867703/96e980be-80ab-11e5-9aaa-a06ef476b7f7.gif)
 
